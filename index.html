@@ -201,6 +201,7 @@
                             <option value="Waiting for Parts" class="text-orange-600">Waiting for Parts</option>
                             <option value="Ready for Collection" class="text-emerald-600">Ready for Collection</option>
                             <option value="Completed & Collected" class="text-slate-600">Completed & Collected</option>
+                            <option value="Failed to Repair" class="text-red-600 font-bold">⚠️ Failed to Repair (Irreparable)</option>
                         </select>
                     </div>
 
@@ -212,7 +213,13 @@
 
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Diagnosis / Work Notes</label>
-                        <textarea id="update-notes" class="custom-input h-32 resize-none text-sm leading-relaxed" placeholder="Describe the diagnosis, the fix applied, or the parts required..."></textarea>
+                        <textarea id="update-notes" class="custom-input h-24 resize-none text-sm leading-relaxed" placeholder="Describe the diagnosis, the fix applied, or the parts required..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-red-700 uppercase tracking-wider mb-2">Technician Final Comments / Reason for Failure</label>
+                        <textarea id="update-tech-comments" class="custom-input h-24 border-red-100 bg-red-50/30 resize-none text-sm leading-relaxed" placeholder="If the repair failed, explain why here (e.g. Board damage, part unavailable)..."></textarea>
+                        <p class="text-[10px] text-slate-400 mt-1">This info helps when explaining the outcome to the client.</p>
                     </div>
                 </div>
 
@@ -361,6 +368,7 @@
                 document.getElementById('update-status').value = rec.status || 'Pending';
                 document.getElementById('update-notes').value = rec.techNotes || '';
                 document.getElementById('update-eta').value = rec.estimatedCompletionDate || '';
+                document.getElementById('update-tech-comments').value = rec.techComments || '';
             }
 
             resetToSearch() {
@@ -433,6 +441,7 @@
                 const status = document.getElementById('update-status').value;
                 const etaDate = document.getElementById('update-eta').value;
                 const notes = document.getElementById('update-notes').value;
+                const techComments = document.getElementById('update-tech-comments').value;
 
                 this.showLoading("Processing Report...");
 
@@ -459,6 +468,7 @@
                         status: status,
                         estimatedCompletionDate: etaDate,
                         techNotes: notes,
+                        techComments: techComments,
                         photos: mergedPhotos,
                         lastUpdated: Date.now()
                     };
