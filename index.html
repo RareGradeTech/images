@@ -29,6 +29,30 @@
             flex-direction: column;
         }
 
+        /* --- MODERN ANIMATIONS --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(37, 99, 235, 0.2);
+            border-color: #93c5fd;
+        }
+
+        .workspace-transition {
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
         /* --- SPINNER OVERLAY --- */
         #global-spinner {
             position: fixed; inset: 0; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(4px);
@@ -54,10 +78,16 @@
             border: 2px dashed #cbd5e1; border-radius: 12px; padding: 30px 20px; text-align: center;
             background: #ffffff; cursor: pointer; transition: all 0.2s;
         }
-        .upload-zone:hover, .upload-zone:active { border-color: #3b82f6; background: #eff6ff; }
+        .upload-zone:hover, .upload-zone:active { border-color: #3b82f6; background: #eff6ff; transform: scale(0.99); }
         
         .img-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 16px; }
         .img-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        /* Custom Checkbox */
+        .custom-checkbox {
+            width: 18px; height: 18px; border-radius: 4px; border: 2px solid #cbd5e1; cursor: pointer;
+            transition: all 0.2s; accent-color: #2563eb;
+        }
 
         /* Toast */
         #toast {
@@ -87,7 +117,7 @@
         <span id="toast-msg">Success!</span>
     </div>
 
-    <header class="bg-white shadow-[0_2px_10px_rgba(0,0,0,0.02)] border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0 z-20">
+    <header class="bg-white shadow-[0_2px_10px_rgba(0,0,0,0.02)] border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0 z-20 relative">
         <div class="flex items-center gap-3">
             <img src="https://i.postimg.cc/0N2N1P77/Whats-App-Image-2026-04-23-at-10-39-54.jpg" alt="Rare Grade Tech" class="w-10 h-10 rounded object-cover shadow-sm border border-slate-200">
             <div>
@@ -95,16 +125,16 @@
                 <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Engineering & Tech Workspace</p>
             </div>
         </div>
-        <button onclick="techApp.resetToSearch()" class="text-slate-400 hover:text-slate-800 text-sm font-semibold transition-colors hidden" id="btn-back">
-            <i class="fa-solid fa-arrow-left mr-1"></i> Close Workspace
+        <button onclick="techApp.resetToSearch()" class="text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg text-sm font-semibold transition-all hidden" id="btn-back">
+            <i class="fa-solid fa-arrow-left mr-2"></i> Exit Workspace
         </button>
     </header>
 
     <div class="flex-1 overflow-hidden relative">
 
-        <div id="search-view" class="absolute inset-0 flex flex-col items-center pt-8 pb-12 overflow-y-auto px-6 bg-slate-50 transition-opacity duration-300 z-10 gap-6">
+        <div id="search-view" class="workspace-transition absolute inset-0 flex flex-col items-center pt-8 pb-12 overflow-y-auto px-6 bg-slate-50 z-10 gap-6">
             
-            <div class="flex bg-slate-200 p-1 rounded-xl w-full max-w-md mx-auto shadow-inner">
+            <div class="flex bg-slate-200 p-1 rounded-xl w-full max-w-md mx-auto shadow-inner animate-fade-in-up">
                 <button id="tab-hardware" onclick="techApp.setMode('hardware')" class="flex-1 py-2.5 rounded-lg text-sm font-bold bg-white shadow text-slate-800 transition-all flex justify-center items-center gap-2">
                     <i class="fa-solid fa-screwdriver-wrench text-blue-500"></i> Hardware
                 </button>
@@ -113,7 +143,7 @@
                 </button>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 w-full max-w-md text-center shrink-0">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 w-full max-w-md text-center shrink-0 animate-fade-in-up" style="animation-delay: 100ms;">
                 <div id="search-icon" class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors">
                     <i class="fa-solid fa-magnifying-glass text-2xl"></i>
                 </div>
@@ -125,14 +155,14 @@
                     <input type="text" id="search-ref-id" class="w-full py-4 pl-14 pr-4 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-lg uppercase focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all" placeholder="1234" inputmode="numeric">
                 </div>
                 
-                <button id="search-btn" onclick="techApp.fetchRecord()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-md transition-all">
+                <button id="search-btn" onclick="techApp.fetchRecord()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all">
                     Load Repair Data
                 </button>
             </div>
 
-            <div class="w-full max-w-5xl shrink-0 mt-4">
+            <div class="w-full max-w-5xl shrink-0 mt-4 animate-fade-in-up" style="animation-delay: 200ms;">
                 <h3 id="queue-title" class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2 px-1">
-                    <i class="fa-solid fa-list-check text-amber-500"></i> Active Hardware Queue
+                    <i class="fa-solid fa-clock text-amber-500"></i> Pending Hardware Repairs
                 </h3>
                 <div id="queue-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     </div>
@@ -140,7 +170,7 @@
 
         </div>
 
-        <div id="hardware-workspace" class="absolute inset-0 flex flex-col md:flex-row opacity-0 pointer-events-none transition-opacity duration-300 z-0">
+        <div id="hardware-workspace" class="workspace-transition absolute inset-0 flex flex-col md:flex-row opacity-0 translate-y-8 pointer-events-none z-0">
             <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50">
                 <div class="max-w-3xl mx-auto space-y-6">
                     
@@ -150,9 +180,9 @@
                             <h2 class="text-2xl font-black text-slate-800 font-mono tracking-tight" id="disp-ref">RGT-0000</h2>
                             <p class="text-sm text-slate-500 mt-1"><i class="fa-solid fa-user text-slate-400 mr-1"></i> <span id="disp-client" class="font-semibold text-slate-700">Loading...</span></p>
                         </div>
-                        <div class="bg-slate-50 px-4 py-3 rounded-lg border border-slate-100 text-right w-full md:w-auto">
-                            <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Current Status</p>
-                            <p class="font-bold text-slate-800" id="disp-status">Pending</p>
+                        <div class="bg-amber-50 px-4 py-3 rounded-lg border border-amber-200 text-right w-full md:w-auto">
+                            <p class="text-[10px] text-amber-600 uppercase font-bold tracking-widest">Current Status</p>
+                            <p class="font-bold text-amber-700" id="disp-status">Pending</p>
                         </div>
                     </div>
 
@@ -201,10 +231,7 @@
                     <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-screwdriver-wrench text-blue-500"></i> Technical Update</h2>
                 </div>
                 <div class="p-6 space-y-6 overflow-y-auto flex-1">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Technician Name</label>
-                        <input type="text" id="update-tech-name" class="custom-input" placeholder="e.g. Katlego" value="Katlego">
-                    </div>
+                    
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Update Repair Status</label>
                         <select id="update-status" class="custom-input font-bold text-slate-800 bg-slate-50 border-slate-300">
@@ -216,28 +243,46 @@
                             <option value="Failed to Repair" class="text-red-600 font-bold">⚠️ Failed to Repair (Irreparable)</option>
                         </select>
                     </div>
+
+                    <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                        <label class="block text-xs font-bold text-blue-800 uppercase tracking-wider mb-3"><i class="fa-solid fa-cart-shopping mr-1"></i> Parts to Buy / Procurement</label>
+                        <div class="grid grid-cols-2 gap-3 text-sm text-slate-700 font-medium">
+                            <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="part-screen" class="custom-checkbox"> Screen</label>
+                            <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="part-battery" class="custom-checkbox"> Battery</label>
+                            <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="part-ram" class="custom-checkbox"> RAM</label>
+                            <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="part-ssd" class="custom-checkbox"> SSD / HDD</label>
+                            <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="part-keyboard" class="custom-checkbox"> Keyboard</label>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-blue-100">
+                            <input type="text" id="part-other" class="custom-input py-2 text-sm bg-white" placeholder="Other specific parts needed...">
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Duration / Estimated Date</label>
                         <input type="date" id="update-eta" class="custom-input">
                     </div>
+                    
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Diagnosis / Work Notes</label>
                         <textarea id="update-notes" class="custom-input h-24 resize-none text-sm leading-relaxed" placeholder="Describe the diagnosis, the fix applied, or the parts required..."></textarea>
                     </div>
+                    
                     <div>
-                        <label class="block text-xs font-bold text-red-700 uppercase tracking-wider mb-2">Reason for Failure (If applicable)</label>
-                        <textarea id="update-tech-comments" class="custom-input h-20 border-red-100 bg-red-50/30 resize-none text-sm leading-relaxed" placeholder="Explain failure reason..."></textarea>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Technician Name</label>
+                        <input type="text" id="update-tech-name" class="custom-input" placeholder="e.g. Katlego" value="Katlego">
                     </div>
+
                 </div>
                 <div class="p-6 border-t border-slate-100 bg-white shrink-0">
                     <button onclick="techApp.saveHardwareUpdate()" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-cloud-arrow-up text-lg"></i> Save Record & Photos
+                        <i class="fa-solid fa-cloud-arrow-up text-lg"></i> Save Record & Details
                     </button>
                 </div>
             </aside>
         </div>
 
-        <div id="software-workspace" class="absolute inset-0 flex flex-col md:flex-row opacity-0 pointer-events-none transition-opacity duration-300 z-0">
+        <div id="software-workspace" class="workspace-transition absolute inset-0 flex flex-col md:flex-row opacity-0 translate-y-8 pointer-events-none z-0">
             <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50">
                 <div class="max-w-4xl mx-auto space-y-6">
                     
@@ -248,8 +293,8 @@
                             <h3 class="text-lg font-bold text-slate-700 mt-1" id="soft-disp-project">Project Name</h3>
                             <p class="text-sm text-slate-500 mt-1"><i class="fa-solid fa-building text-slate-400 mr-1"></i> <span id="soft-disp-client">Client Name</span></p>
                         </div>
-                        <div class="bg-slate-50 px-4 py-3 rounded-lg border border-slate-100 text-right w-full md:w-auto">
-                            <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Pipeline Status</p>
+                        <div class="bg-purple-50 px-4 py-3 rounded-lg border border-purple-200 text-right w-full md:w-auto">
+                            <p class="text-[10px] text-purple-600 uppercase font-bold tracking-widest">Pipeline Status</p>
                             <p class="font-bold text-purple-700" id="soft-disp-status">Requirements Gathering</p>
                         </div>
                     </div>
@@ -289,10 +334,7 @@
                     <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-terminal text-purple-500"></i> Developer Controls</h2>
                 </div>
                 <div class="p-6 space-y-6 overflow-y-auto flex-1">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Assigned Developer</label>
-                        <input type="text" id="update-soft-dev" class="custom-input" placeholder="e.g. Katlego" value="Katlego">
-                    </div>
+                    
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Update Project Phase</label>
                         <select id="update-soft-status" class="custom-input font-bold text-slate-800 bg-slate-50 border-slate-300">
@@ -303,9 +345,15 @@
                             <option value="Deployed / Completed" class="text-emerald-600">Deployed / Completed</option>
                         </select>
                     </div>
+
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Development Notes / Commits</label>
                         <textarea id="update-soft-notes" class="custom-input h-48 resize-none text-sm leading-relaxed" placeholder="Log progress, milestone completions, or specific API/Repo changes..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Assigned Developer</label>
+                        <input type="text" id="update-soft-dev" class="custom-input" placeholder="e.g. Katlego" value="Katlego">
                     </div>
                 </div>
                 <div class="p-6 border-t border-slate-100 bg-white shrink-0">
@@ -363,13 +411,13 @@
             // REAL-TIME DATA SYNC & QUEUE RENDERING
             // ==========================================
             listenForData() {
-                // Hardware Queue (Ignore fully completed/collected devices in the pending view)
+                // Hardware Queue (STRICTLY PENDING)
                 this.db.ref('reports').on('value', snap => {
                     this.hardwareData = [];
                     snap.forEach(child => {
                         let val = child.val();
                         val.key = child.key;
-                        if(val.status !== 'Completed & Collected' && val.status !== 'Failed to Repair') {
+                        if(val.status === 'Pending') {
                             this.hardwareData.push(val);
                         }
                     });
@@ -377,13 +425,13 @@
                     if(this.currentMode === 'hardware') this.renderQueue();
                 });
 
-                // Software Queue (Ignore fully deployed projects)
+                // Software Queue (STRICTLY PENDING / Requirements Gathering)
                 this.db.ref('software_projects').on('value', snap => {
                     this.softwareData = [];
                     snap.forEach(child => {
                         let val = child.val();
                         val.key = child.key;
-                        if(val.status !== 'Deployed / Completed') {
+                        if(val.status === 'Requirements Gathering' || val.status === 'Pending') {
                             this.softwareData.push(val);
                         }
                     });
@@ -414,7 +462,7 @@
                     btnLoad.innerText = "Load Repair Data";
 
                     // Queue Title
-                    document.getElementById('queue-title').innerHTML = '<i class="fa-solid fa-list-check text-amber-500"></i> Active Hardware Queue';
+                    document.getElementById('queue-title').innerHTML = '<i class="fa-solid fa-clock text-amber-500"></i> Pending Hardware Repairs';
 
                 } else {
                     // UI styling for tabs
@@ -430,7 +478,7 @@
                     btnLoad.innerText = "Load Software Pipeline";
 
                     // Queue Title
-                    document.getElementById('queue-title').innerHTML = '<i class="fa-solid fa-code-branch text-purple-500"></i> Active Software Projects';
+                    document.getElementById('queue-title').innerHTML = '<i class="fa-solid fa-code-branch text-purple-500"></i> Pending Software Projects';
                 }
 
                 document.getElementById('search-ref-id').value = '';
@@ -444,13 +492,14 @@
                 const dataArray = this.currentMode === 'hardware' ? this.hardwareData : this.softwareData;
 
                 if (dataArray.length === 0) {
-                    grid.innerHTML = `<div class="col-span-full bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-500 text-sm border-dashed">You're all caught up! No active tasks in this view.</div>`;
+                    grid.innerHTML = `<div class="col-span-full bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-500 text-sm border-dashed">You're all caught up! No pending tasks in this view.</div>`;
                     return;
                 }
 
-                dataArray.forEach(rec => {
+                dataArray.forEach((rec, index) => {
                     const card = document.createElement('div');
-                    card.className = "bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:border-blue-400 hover:shadow-md cursor-pointer transition-all flex flex-col h-full";
+                    card.className = "card-hover bg-white rounded-xl border border-slate-200 p-5 cursor-pointer flex flex-col h-full opacity-0 animate-fade-in-up";
+                    card.style.animationDelay = `${index * 50}ms`;
                     
                     card.onclick = () => {
                         document.getElementById('search-ref-id').value = rec.refId;
@@ -460,27 +509,27 @@
                     if (this.currentMode === 'hardware') {
                         card.innerHTML = `
                             <div class="flex justify-between items-start mb-3">
-                                <span class="font-mono text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">RGT-${rec.refId}</span>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">${rec.status}</span>
+                                <span class="font-mono text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-100">RGT-${rec.refId}</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-1 rounded-full">${rec.status}</span>
                             </div>
                             <h4 class="font-bold text-slate-800 text-sm truncate">${rec.device || 'Unknown Device'}</h4>
                             <p class="text-xs text-slate-500 mt-1 truncate"><i class="fa-solid fa-user mr-1 text-slate-400"></i> ${rec.clientName}</p>
                             <div class="mt-auto pt-4 flex justify-between items-center text-xs">
-                                <span class="text-slate-400">${this.timeAgo(rec.timestamp)}</span>
-                                <i class="fa-solid fa-arrow-right text-slate-300"></i>
+                                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> ${this.timeAgo(rec.timestamp)}</span>
+                                <i class="fa-solid fa-arrow-right text-blue-300"></i>
                             </div>
                         `;
                     } else {
                         card.innerHTML = `
                             <div class="flex justify-between items-start mb-3">
-                                <span class="font-mono text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded">SFT-${rec.refId}</span>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">${rec.status}</span>
+                                <span class="font-mono text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded border border-purple-100">SFT-${rec.refId}</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Pending</span>
                             </div>
                             <h4 class="font-bold text-slate-800 text-sm truncate">${rec.projectName || 'Unnamed Project'}</h4>
                             <p class="text-xs text-slate-500 mt-1 truncate"><i class="fa-solid fa-building mr-1 text-slate-400"></i> ${rec.clientName}</p>
                             <div class="mt-auto pt-4 flex justify-between items-center text-xs">
-                                <span class="text-slate-400 font-medium">${rec.platform}</span>
-                                <i class="fa-solid fa-code text-slate-300"></i>
+                                <span class="text-slate-400 font-medium bg-slate-100 px-2 py-1 rounded">${rec.platform}</span>
+                                <i class="fa-solid fa-laptop-code text-purple-300"></i>
                             </div>
                         `;
                     }
@@ -563,8 +612,8 @@
                 setTimeout(() => {
                     const targetWS = this.currentMode === 'hardware' ? 'hardware-workspace' : 'software-workspace';
                     const ws = document.getElementById(targetWS);
-                    ws.classList.remove('opacity-0', 'pointer-events-none');
-                    ws.classList.add('z-10');
+                    ws.classList.remove('opacity-0', 'translate-y-8', 'pointer-events-none');
+                    ws.classList.add('z-10', 'translate-y-0');
                 }, 300);
             }
 
@@ -576,14 +625,17 @@
                 document.getElementById('search-ref-id').value = '';
                 document.getElementById('btn-back').classList.add('hidden');
 
-                document.getElementById('hardware-workspace').classList.add('opacity-0', 'pointer-events-none');
-                document.getElementById('hardware-workspace').classList.remove('z-10');
-                document.getElementById('software-workspace').classList.add('opacity-0', 'pointer-events-none');
-                document.getElementById('software-workspace').classList.remove('z-10');
+                const hwWs = document.getElementById('hardware-workspace');
+                hwWs.classList.add('opacity-0', 'translate-y-8', 'pointer-events-none');
+                hwWs.classList.remove('z-10', 'translate-y-0');
+
+                const swWs = document.getElementById('software-workspace');
+                swWs.classList.add('opacity-0', 'translate-y-8', 'pointer-events-none');
+                swWs.classList.remove('z-10', 'translate-y-0');
                 
                 setTimeout(() => {
                     document.getElementById('search-view').classList.remove('opacity-0', 'pointer-events-none');
-                }, 300);
+                }, 400);
             }
 
             // --- HARDWARE WORKSPACE DATA ---
@@ -626,7 +678,15 @@
                 document.getElementById('update-status').value = rec.status || 'Pending';
                 document.getElementById('update-notes').value = rec.techNotes || '';
                 document.getElementById('update-eta').value = rec.estimatedCompletionDate || '';
-                document.getElementById('update-tech-comments').value = rec.techComments || '';
+                
+                // Populate the Procurement Checklist
+                const parts = rec.partsRequired || {};
+                document.getElementById('part-screen').checked = parts.screen || false;
+                document.getElementById('part-battery').checked = parts.battery || false;
+                document.getElementById('part-ram').checked = parts.ram || false;
+                document.getElementById('part-ssd').checked = parts.ssd || false;
+                document.getElementById('part-keyboard').checked = parts.keyboard || false;
+                document.getElementById('part-other').value = parts.other || '';
             }
 
             // --- SOFTWARE WORKSPACE DATA ---
@@ -680,7 +740,7 @@
                     reader.onload = (e) => {
                         const img = document.createElement('img');
                         img.src = e.target.result; 
-                        img.className = "img-thumb";
+                        img.className = "img-thumb animate-fade-in-up";
                         grid.appendChild(img);
                     }
                     reader.readAsDataURL(file);
@@ -713,9 +773,18 @@
                 const status = document.getElementById('update-status').value;
                 const etaDate = document.getElementById('update-eta').value;
                 const notes = document.getElementById('update-notes').value;
-                const techComments = document.getElementById('update-tech-comments').value;
 
-                this.showLoading("Processing Report...");
+                // Capture Procurement Parts
+                const partsRequired = {
+                    screen: document.getElementById('part-screen').checked,
+                    battery: document.getElementById('part-battery').checked,
+                    ram: document.getElementById('part-ram').checked,
+                    ssd: document.getElementById('part-ssd').checked,
+                    keyboard: document.getElementById('part-keyboard').checked,
+                    other: document.getElementById('part-other').value
+                };
+
+                this.showLoading("Processing Update...");
 
                 try {
                     let newUrls = [];
@@ -736,7 +805,7 @@
                         status: status,
                         estimatedCompletionDate: etaDate,
                         techNotes: notes,
-                        techComments: techComments,
+                        partsRequired: partsRequired,
                         photos: mergedPhotos,
                         lastUpdated: Date.now()
                     };
