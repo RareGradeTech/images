@@ -199,6 +199,8 @@
                             <div>
                                 <span class="text-[10px] font-bold text-slate-500 uppercase">Device Model</span>
                                 <p class="font-medium text-slate-800 text-base" id="disp-device">---</p>
+                                <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-palette mr-1"></i> Color: <span id="disp-color" class="font-medium">---</span></p>
+                                <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-plug mr-1"></i> Charger: <span id="disp-charger" class="font-medium">---</span></p>
                             </div>
                             <div>
                                 <span class="text-[10px] font-bold text-slate-500 uppercase">Reported Issue</span>
@@ -559,6 +561,15 @@
                     });
                     this.hardwareDataPending.sort((a,b) => b.timestamp - a.timestamp);
                     if(this.currentMode === 'hardware') this.renderQueue();
+
+                    // Real-time UI Sync for open Workspace
+                    if(this.currentMode === 'hardware' && this.currentDbKey) {
+                        const updatedRecord = this.hardwareDataAll.find(r => r.key === this.currentDbKey);
+                        if(updatedRecord) {
+                            this.currentRecord = updatedRecord;
+                            this.populateHardwareDisplayOnly(); // Update read-only displays instantly
+                        }
+                    }
                 });
 
                 this.db.ref('software_projects').on('value', snap => {
@@ -574,6 +585,15 @@
                     });
                     this.softwareDataPending.sort((a,b) => b.timestamp - a.timestamp);
                     if(this.currentMode === 'software') this.renderQueue();
+
+                    // Real-time UI Sync
+                    if(this.currentMode === 'software' && this.currentDbKey) {
+                        const updatedRecord = this.softwareDataAll.find(r => r.key === this.currentDbKey);
+                        if(updatedRecord) {
+                            this.currentRecord = updatedRecord;
+                            this.populateSoftwareDisplayOnly(); 
+                        }
+                    }
                 });
             }
 
@@ -827,13 +847,26 @@
                 }
             }
 
-            populateHardwareWorkspace() {
+            populateHardwareDisplayOnly() {
                 const rec = this.currentRecord;
                 document.getElementById('disp-ref').innerText = `RGT-${rec.refId}`;
                 document.getElementById('disp-client').innerText = rec.clientName || 'Unknown';
                 document.getElementById('disp-device').innerText = rec.device || 'Not specified';
+                document.getElementById('disp-color').innerText = rec.color || 'Not specified';
                 document.getElementById('disp-issue').innerText = rec.issue || 'No issue recorded.';
                 document.getElementById('disp-status').innerText = rec.status || 'Pending';
+
+                // Charger UI update
+                let chargerTxt = 'None left by client';
+                const charDisp = document.getElementById('disp-charger');
+                if (rec.charger && rec.charger.included) {
+                    chargerTxt = 'Included';
+                    if (rec.charger.specs) chargerTxt += ` (${rec.charger.specs})`;
+                    charDisp.classList.replace('text-slate-500', 'text-amber-600');
+                } else {
+                    charDisp.classList.replace('text-amber-600', 'text-slate-500');
+                }
+                charDisp.innerText = chargerTxt;
 
                 const setIcon = (id, condition) => {
                     const el = document.getElementById(id);
@@ -843,11 +876,16 @@
                 setIcon('disp-chk-power', rec.checks?.power);
                 setIcon('disp-chk-cracks', rec.checks?.cracks);
                 setIcon('disp-chk-data', rec.checks?.dataWaiver);
+            }
+
+            populateHardwareWorkspace() {
+                const rec = this.currentRecord;
+                this.populateHardwareDisplayOnly();
 
                 // --- Photos Logic ---
                 const hasBefore = this.renderExistingGallery('before', rec.photosBefore);
                 const hasAfter = this.renderExistingGallery('after', rec.photosAfter);
-                const hasLegacy = this.renderExistingGallery('legacy', rec.photos); // old arrays without categories
+                const hasLegacy = this.renderExistingGallery('legacy', rec.photos); 
 
                 if (hasBefore || hasAfter || hasLegacy) {
                     document.getElementById('existing-photos-container').classList.remove('hidden');
@@ -855,6 +893,7 @@
                     document.getElementById('existing-photos-container').classList.add('hidden');
                 }
 
+                // Tech inputs
                 document.getElementById('update-tech-name').value = rec.techName || "Katlego";
                 document.getElementById('update-status').value = rec.status || 'Pending';
                 document.getElementById('update-notes').value = rec.techNotes || '';
@@ -877,7 +916,7 @@
             }
 
             // --- UI POPULATION: SOFTWARE ---
-            populateSoftwareWorkspace() {
+            populateSoftwareDisplayOnly() {
                 const rec = this.currentRecord;
                 document.getElementById('soft-disp-ref').innerText = `SFT-${rec.refId}`;
                 document.getElementById('soft-disp-project').innerText = rec.projectName || 'Unnamed Project';
@@ -901,6 +940,11 @@
                     repoEl.classList.add('text-slate-400', 'pointer-events-none');
                     repoEl.classList.remove('text-blue-600');
                 }
+            }
+
+            populateSoftwareWorkspace() {
+                const rec = this.currentRecord;
+                this.populateSoftwareDisplayOnly();
 
                 document.getElementById('update-soft-dev').value = rec.devAssigned || "Katlego";
                 document.getElementById('update-soft-status').value = rec.status || 'Requirements Gathering';
