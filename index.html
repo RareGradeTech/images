@@ -31,12 +31,12 @@
 
         /* --- MODERN ANIMATIONS --- */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
         .animate-fade-in-up {
-            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .card-hover {
@@ -226,7 +226,7 @@
                 </div>
             </main>
 
-            <aside class="w-full md:w-[400px] bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-[-10px_0_20px_rgba(0,0,0,0.02)]">
+            <aside class="w-full md:w-[450px] bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-[-10px_0_20px_rgba(0,0,0,0.02)]">
                 <div class="p-6 border-b border-slate-100 bg-slate-50">
                     <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-screwdriver-wrench text-blue-500"></i> Technical Update</h2>
                 </div>
@@ -244,17 +244,69 @@
                         </select>
                     </div>
 
-                    <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-                        <label class="block text-xs font-bold text-blue-800 uppercase tracking-wider mb-3"><i class="fa-solid fa-cart-shopping mr-1"></i> Parts to Buy / Procurement</label>
-                        <div class="grid grid-cols-2 gap-3 text-sm text-slate-700 font-medium">
-                            <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="part-screen" class="custom-checkbox"> Screen</label>
-                            <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="part-battery" class="custom-checkbox"> Battery</label>
-                            <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="part-ram" class="custom-checkbox"> RAM</label>
-                            <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="part-ssd" class="custom-checkbox"> SSD / HDD</label>
-                            <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="part-keyboard" class="custom-checkbox"> Keyboard</label>
+                    <div class="bg-blue-50/50 p-5 rounded-xl border border-blue-100">
+                        <label class="block text-xs font-bold text-blue-800 uppercase tracking-wider mb-3"><i class="fa-solid fa-cart-shopping mr-1"></i> Procurement & Parts Required</label>
+                        
+                        <div class="flex flex-col gap-3 text-sm text-slate-700 font-medium">
+                            <div>
+                                <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors">
+                                    <input type="checkbox" id="part-screen" class="custom-checkbox" onchange="techApp.togglePartDetails('screen')"> Screen Replacement
+                                </label>
+                                <div id="details-screen" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-blue-200 ml-2 animate-fade-in-up" style="animation-duration: 0.2s;">
+                                    <input type="text" id="part-screen-specs" class="custom-input py-1.5 text-xs bg-white" placeholder="Size & Resolution (e.g. 15.6 FHD)">
+                                    <input type="text" id="part-screen-pn" class="custom-input py-1.5 text-xs bg-white" placeholder="Specific Part Number (Optional)">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors">
+                                    <input type="checkbox" id="part-battery" class="custom-checkbox" onchange="techApp.togglePartDetails('battery')"> Battery Replacement
+                                </label>
+                                <div id="details-battery" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-blue-200 ml-2 animate-fade-in-up" style="animation-duration: 0.2s;">
+                                    <input type="text" id="part-battery-model" class="custom-input py-1.5 text-xs bg-white" placeholder="Battery Model / P/N">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors">
+                                    <input type="checkbox" id="part-ram" class="custom-checkbox" onchange="techApp.togglePartDetails('ram')"> RAM Upgrade / Replacement
+                                </label>
+                                <div id="details-ram" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-blue-200 ml-2 animate-fade-in-up" style="animation-duration: 0.2s;">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <input type="text" id="part-ram-type" class="custom-input py-1.5 text-xs bg-white" placeholder="Type (e.g. DDR4)">
+                                        <input type="text" id="part-ram-capacity" class="custom-input py-1.5 text-xs bg-white" placeholder="Size (e.g. 8GB)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors">
+                                    <input type="checkbox" id="part-ssd" class="custom-checkbox" onchange="techApp.togglePartDetails('ssd')"> SSD / HDD Drive
+                                </label>
+                                <div id="details-ssd" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-blue-200 ml-2 animate-fade-in-up" style="animation-duration: 0.2s;">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <input type="text" id="part-ssd-type" class="custom-input py-1.5 text-xs bg-white" placeholder="NVMe / SATA">
+                                        <input type="text" id="part-ssd-capacity" class="custom-input py-1.5 text-xs bg-white" placeholder="Capacity (e.g. 512GB)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors">
+                                    <input type="checkbox" id="part-keyboard" class="custom-checkbox" onchange="techApp.togglePartDetails('keyboard')"> Keyboard
+                                </label>
+                                <div id="details-keyboard" class="hidden pl-4 mt-2 space-y-2 border-l-2 border-blue-200 ml-2 animate-fade-in-up" style="animation-duration: 0.2s;">
+                                    <input type="text" id="part-keyboard-layout" class="custom-input py-1.5 text-xs bg-white" placeholder="Layout (e.g. US/UK)">
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <input type="checkbox" id="part-keyboard-backlit" class="custom-checkbox w-4 h-4">
+                                        <span class="text-xs text-slate-500">Requires Backlit</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mt-3 pt-3 border-t border-blue-100">
-                            <input type="text" id="part-other" class="custom-input py-2 text-sm bg-white" placeholder="Other specific parts needed...">
+                        
+                        <div class="mt-4 pt-4 border-t border-blue-100">
+                            <input type="text" id="part-other" class="custom-input py-2 text-sm bg-white" placeholder="Other specific parts needed (Fans, DC Jack, etc.)">
                         </div>
                     </div>
 
@@ -385,16 +437,14 @@
 
         class TechnicianPortal {
             constructor() {
-                this.currentMode = 'hardware'; // 'hardware' or 'software'
+                this.currentMode = 'hardware'; 
                 this.db = null;
                 
-                // Unified Data Storage (Memory strategy to prevent query bugs)
                 this.hardwareDataAll = [];
                 this.hardwareDataPending = [];
                 this.softwareDataAll = [];
                 this.softwareDataPending = [];
                 
-                // Active workspace state
                 this.currentDbKey = null;
                 this.currentRecord = null; 
                 this.selectedFiles = [];
@@ -410,39 +460,29 @@
             }
 
             // ==========================================
-            // REAL-TIME DATA SYNC & QUEUE RENDERING
+            // REAL-TIME DATA SYNC
             // ==========================================
             listenForData() {
-                // Hardware Sync
                 this.db.ref('reports').on('value', snap => {
                     this.hardwareDataAll = [];
                     this.hardwareDataPending = [];
                     snap.forEach(child => {
                         let val = child.val();
                         val.key = child.key;
-                        
-                        this.hardwareDataAll.push(val); // Keep all for searching
-                        
-                        // Strict filter for the pending queue view
-                        if(val.status === 'Pending') {
-                            this.hardwareDataPending.push(val);
-                        }
+                        this.hardwareDataAll.push(val); 
+                        if(val.status === 'Pending') this.hardwareDataPending.push(val);
                     });
                     this.hardwareDataPending.sort((a,b) => b.timestamp - a.timestamp);
                     if(this.currentMode === 'hardware') this.renderQueue();
                 });
 
-                // Software Sync
                 this.db.ref('software_projects').on('value', snap => {
                     this.softwareDataAll = [];
                     this.softwareDataPending = [];
                     snap.forEach(child => {
                         let val = child.val();
                         val.key = child.key;
-                        
-                        this.softwareDataAll.push(val); // Keep all for searching
-                        
-                        // Strict filter for the pending queue view
+                        this.softwareDataAll.push(val);
                         if(val.status === 'Requirements Gathering' || val.status === 'Pending') {
                             this.softwareDataPending.push(val);
                         }
@@ -461,35 +501,26 @@
                 const btnLoad = document.getElementById('search-btn');
 
                 if (mode === 'hardware') {
-                    // UI styling for tabs
                     tabHW.className = "flex-1 py-2.5 rounded-lg text-sm font-bold bg-white shadow text-slate-800 transition-all flex justify-center items-center gap-2";
                     tabSW.className = "flex-1 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all flex justify-center items-center gap-2";
                     
-                    // Search UI updates
                     document.getElementById('search-title').innerText = "Find Repair File";
                     document.getElementById('search-desc').innerText = "Enter the Reference ID to pull up the client's device details.";
                     document.getElementById('search-prefix').innerText = "RGT-";
                     searchIcon.className = "w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors";
                     searchIcon.innerHTML = '<i class="fa-solid fa-screwdriver-wrench text-2xl"></i>';
                     btnLoad.innerText = "Load Repair Data";
-
-                    // Queue Title
                     document.getElementById('queue-title').innerHTML = '<i class="fa-solid fa-clock text-amber-500"></i> Pending Hardware Repairs';
-
                 } else {
-                    // UI styling for tabs
                     tabSW.className = "flex-1 py-2.5 rounded-lg text-sm font-bold bg-white shadow text-slate-800 transition-all flex justify-center items-center gap-2";
                     tabHW.className = "flex-1 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all flex justify-center items-center gap-2";
                     
-                    // Search UI updates
                     document.getElementById('search-title').innerText = "Find Software Project";
                     document.getElementById('search-desc').innerText = "Enter the Project ID to access repo links and specs.";
                     document.getElementById('search-prefix').innerText = "SFT-";
                     searchIcon.className = "w-16 h-16 bg-purple-50 text-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors";
                     searchIcon.innerHTML = '<i class="fa-solid fa-laptop-code text-2xl"></i>';
                     btnLoad.innerText = "Load Software Pipeline";
-
-                    // Queue Title
                     document.getElementById('queue-title').innerHTML = '<i class="fa-solid fa-code-branch text-purple-500"></i> Pending Software Projects';
                 }
 
@@ -501,7 +532,6 @@
                 const grid = document.getElementById('queue-grid');
                 grid.innerHTML = '';
                 
-                // Explicitly pull from the *Pending* arrays
                 const dataArray = this.currentMode === 'hardware' ? this.hardwareDataPending : this.softwareDataPending;
 
                 if (dataArray.length === 0) {
@@ -569,12 +599,11 @@
             }
 
             // ==========================================
-            // FETCH & DISPLAY WORKSPACE (IN-MEMORY SEARCH)
+            // FETCH RECORD (MEMORY SEARCH)
             // ==========================================
             fetchRecord() {
                 let rawRef = document.getElementById('search-ref-id').value.trim().toUpperCase();
                 
-                // Cleanup prefix if accidentally typed
                 if (rawRef.startsWith('RGT-')) rawRef = rawRef.replace('RGT-', '');
                 if (rawRef.startsWith('SFT-')) rawRef = rawRef.replace('SFT-', '');
                 
@@ -585,10 +614,7 @@
 
                 this.showLoading("Loading Workspace...");
 
-                // Determine which full database array to search
                 const dataPool = this.currentMode === 'hardware' ? this.hardwareDataAll : this.softwareDataAll;
-                
-                // Find directly in memory to bypass strict type requirements
                 const record = dataPool.find(r => String(r.refId) === String(rawRef));
 
                 if (!record) {
@@ -649,7 +675,46 @@
                 }, 400);
             }
 
-            // --- HARDWARE WORKSPACE DATA ---
+            // ==========================================
+            // UI POPULATION: HARDWARE
+            // ==========================================
+            togglePartDetails(partId) {
+                const cb = document.getElementById(`part-${partId}`);
+                const details = document.getElementById(`details-${partId}`);
+                if(cb && details) {
+                    if(cb.checked) {
+                        details.classList.remove('hidden');
+                    } else {
+                        details.classList.add('hidden');
+                    }
+                }
+            }
+
+            loadPartData(partId, data, fields) {
+                const cb = document.getElementById(`part-${partId}`);
+                const isNeeded = typeof data === 'object' ? data?.needed : !!data;
+                cb.checked = isNeeded;
+                
+                if(typeof data === 'object') {
+                    fields.forEach(f => {
+                        const input = document.getElementById(`part-${partId}-${f}`);
+                        if(input) {
+                            if(input.type === 'checkbox') input.checked = data[f] || false;
+                            else input.value = data[f] || '';
+                        }
+                    });
+                } else {
+                    fields.forEach(f => {
+                        const input = document.getElementById(`part-${partId}-${f}`);
+                        if(input) {
+                            if(input.type === 'checkbox') input.checked = false;
+                            else input.value = '';
+                        }
+                    });
+                }
+                this.togglePartDetails(partId);
+            }
+
             populateHardwareWorkspace() {
                 const rec = this.currentRecord;
                 document.getElementById('disp-ref').innerText = `RGT-${rec.refId}`;
@@ -690,17 +755,17 @@
                 document.getElementById('update-notes').value = rec.techNotes || '';
                 document.getElementById('update-eta').value = rec.estimatedCompletionDate || '';
                 
-                // Populate the Procurement Checklist
+                // Populate Expanding Procurement Checklist
                 const parts = rec.partsRequired || {};
-                document.getElementById('part-screen').checked = parts.screen || false;
-                document.getElementById('part-battery').checked = parts.battery || false;
-                document.getElementById('part-ram').checked = parts.ram || false;
-                document.getElementById('part-ssd').checked = parts.ssd || false;
-                document.getElementById('part-keyboard').checked = parts.keyboard || false;
+                this.loadPartData('screen', parts.screen, ['specs', 'pn']);
+                this.loadPartData('battery', parts.battery, ['model']);
+                this.loadPartData('ram', parts.ram, ['type', 'capacity']);
+                this.loadPartData('ssd', parts.ssd, ['type', 'capacity']);
+                this.loadPartData('keyboard', parts.keyboard, ['layout', 'backlit']);
                 document.getElementById('part-other').value = parts.other || '';
             }
 
-            // --- SOFTWARE WORKSPACE DATA ---
+            // --- UI POPULATION: SOFTWARE ---
             populateSoftwareWorkspace() {
                 const rec = this.currentRecord;
                 document.getElementById('soft-disp-ref').innerText = `SFT-${rec.refId}`;
@@ -732,7 +797,7 @@
             }
 
             // ==========================================
-            // FILE HANDLING (HARDWARE ONLY)
+            // FILE HANDLING (HARDWARE)
             // ==========================================
             handleFiles(input) {
                 if (input.files) {
@@ -777,6 +842,20 @@
             // ==========================================
             // SAVING UPDATES
             // ==========================================
+            getPartData(partId, fields) {
+                const isNeeded = document.getElementById(`part-${partId}`).checked;
+                let data = { needed: isNeeded };
+                if(isNeeded) {
+                    fields.forEach(f => {
+                        const input = document.getElementById(`part-${partId}-${f}`);
+                        if(input) {
+                            data[f] = input.type === 'checkbox' ? input.checked : input.value;
+                        }
+                    });
+                }
+                return data;
+            }
+
             async saveHardwareUpdate() {
                 if (!this.currentDbKey) return;
 
@@ -785,12 +864,13 @@
                 const etaDate = document.getElementById('update-eta').value;
                 const notes = document.getElementById('update-notes').value;
 
+                // Scrape Detailed Procurement Fields
                 const partsRequired = {
-                    screen: document.getElementById('part-screen').checked,
-                    battery: document.getElementById('part-battery').checked,
-                    ram: document.getElementById('part-ram').checked,
-                    ssd: document.getElementById('part-ssd').checked,
-                    keyboard: document.getElementById('part-keyboard').checked,
+                    screen: this.getPartData('screen', ['specs', 'pn']),
+                    battery: this.getPartData('battery', ['model']),
+                    ram: this.getPartData('ram', ['type', 'capacity']),
+                    ssd: this.getPartData('ssd', ['type', 'capacity']),
+                    keyboard: this.getPartData('keyboard', ['layout', 'backlit']),
                     other: document.getElementById('part-other').value
                 };
 
