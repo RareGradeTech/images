@@ -388,9 +388,11 @@
                 this.currentMode = 'hardware'; // 'hardware' or 'software'
                 this.db = null;
                 
-                // Data Storage
-                this.hardwareData = [];
-                this.softwareData = [];
+                // Unified Data Storage (Memory strategy to prevent query bugs)
+                this.hardwareDataAll = [];
+                this.hardwareDataPending = [];
+                this.softwareDataAll = [];
+                this.softwareDataPending = [];
                 
                 // Active workspace state
                 this.currentDbKey = null;
@@ -411,31 +413,41 @@
             // REAL-TIME DATA SYNC & QUEUE RENDERING
             // ==========================================
             listenForData() {
-                // Hardware Queue (STRICTLY PENDING)
+                // Hardware Sync
                 this.db.ref('reports').on('value', snap => {
-                    this.hardwareData = [];
+                    this.hardwareDataAll = [];
+                    this.hardwareDataPending = [];
                     snap.forEach(child => {
                         let val = child.val();
                         val.key = child.key;
+                        
+                        this.hardwareDataAll.push(val); // Keep all for searching
+                        
+                        // Strict filter for the pending queue view
                         if(val.status === 'Pending') {
-                            this.hardwareData.push(val);
+                            this.hardwareDataPending.push(val);
                         }
                     });
-                    this.hardwareData.sort((a,b) => b.timestamp - a.timestamp);
+                    this.hardwareDataPending.sort((a,b) => b.timestamp - a.timestamp);
                     if(this.currentMode === 'hardware') this.renderQueue();
                 });
 
-                // Software Queue (STRICTLY PENDING / Requirements Gathering)
+                // Software Sync
                 this.db.ref('software_projects').on('value', snap => {
-                    this.softwareData = [];
+                    this.softwareDataAll = [];
+                    this.softwareDataPending = [];
                     snap.forEach(child => {
                         let val = child.val();
                         val.key = child.key;
+                        
+                        this.softwareDataAll.push(val); // Keep all for searching
+                        
+                        // Strict filter for the pending queue view
                         if(val.status === 'Requirements Gathering' || val.status === 'Pending') {
-                            this.softwareData.push(val);
+                            this.softwareDataPending.push(val);
                         }
                     });
-                    this.softwareData.sort((a,b) => b.timestamp - a.timestamp);
+                    this.softwareDataPending.sort((a,b) => b.timestamp - a.timestamp);
                     if(this.currentMode === 'software') this.renderQueue();
                 });
             }
@@ -489,7 +501,8 @@
                 const grid = document.getElementById('queue-grid');
                 grid.innerHTML = '';
                 
-                const dataArray = this.currentMode === 'hardware' ? this.hardwareData : this.softwareData;
+                // Explicitly pull from the *Pending* arrays
+                const dataArray = this.currentMode === 'hardware' ? this.hardwareDataPending : this.softwareDataPending;
 
                 if (dataArray.length === 0) {
                     grid.innerHTML = `<div class="col-span-full bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-500 text-sm border-dashed">You're all caught up! No pending tasks in this view.</div>`;
@@ -556,9 +569,9 @@
             }
 
             // ==========================================
-            // FETCH & DISPLAY WORKSPACE
+            // FETCH & DISPLAY WORKSPACE (IN-MEMORY SEARCH)
             // ==========================================
-            async fetchRecord() {
+            fetchRecord() {
                 let rawRef = document.getElementById('search-ref-id').value.trim().toUpperCase();
                 
                 // Cleanup prefix if accidentally typed
@@ -570,38 +583,36 @@
                     return;
                 }
 
-                this.showLoading("Searching Database...");
+                this.showLoading("Loading Workspace...");
 
-                const collection = this.currentMode === 'hardware' ? 'reports' : 'software_projects';
+                // Determine which full database array to search
+                const dataPool = this.currentMode === 'hardware' ? this.hardwareDataAll : this.softwareDataAll;
                 
+                // Find directly in memory to bypass strict type requirements
+                const record = dataPool.find(r => String(r.refId) === String(rawRef));
+
+                if (!record) {
+                    this.hideLoading();
+                    const prefix = this.currentMode === 'hardware' ? 'RGT' : 'SFT';
+                    this.showToast(`Record ${prefix}-${rawRef} not found.`, "error");
+                    return;
+                }
+
+                this.currentDbKey = record.key;
+                this.currentRecord = record;
+
                 try {
-                    const snapshot = await this.db.ref(collection).orderByChild('refId').equalTo(rawRef).once('value');
-                    
-                    if (!snapshot.exists()) {
-                        this.hideLoading();
-                        const prefix = this.currentMode === 'hardware' ? 'RGT' : 'SFT';
-                        this.showToast(`Record ${prefix}-${rawRef} not found.`, "error");
-                        return;
-                    }
-
-                    snapshot.forEach(childSnapshot => {
-                        this.currentDbKey = childSnapshot.key;
-                        this.currentRecord = childSnapshot.val();
-                    });
-
                     if(this.currentMode === 'hardware') {
                         this.populateHardwareWorkspace();
                     } else {
                         this.populateSoftwareWorkspace();
                     }
-
                     this.hideLoading();
                     this.openWorkspace();
-
-                } catch (error) {
-                    console.error(error);
+                } catch (err) {
+                    console.error("UI Population Error:", err);
                     this.hideLoading();
-                    this.showToast("Database connection error", "error");
+                    this.showToast("Error loading workspace visuals.", "error");
                 }
             }
 
@@ -764,7 +775,7 @@
             }
 
             // ==========================================
-            // SAVING UPDATES (HARDWARE)
+            // SAVING UPDATES
             // ==========================================
             async saveHardwareUpdate() {
                 if (!this.currentDbKey) return;
@@ -774,7 +785,6 @@
                 const etaDate = document.getElementById('update-eta').value;
                 const notes = document.getElementById('update-notes').value;
 
-                // Capture Procurement Parts
                 const partsRequired = {
                     screen: document.getElementById('part-screen').checked,
                     battery: document.getElementById('part-battery').checked,
@@ -826,9 +836,6 @@
                 }
             }
 
-            // ==========================================
-            // SAVING UPDATES (SOFTWARE)
-            // ==========================================
             async saveSoftwareUpdate() {
                 if (!this.currentDbKey) return;
 
@@ -859,8 +866,17 @@
             }
 
             // ==========================================
-            // UTILITIES
+            // UI UTILITIES
             // ==========================================
+            showLoading(text) {
+                document.getElementById('spinner-text').innerText = text;
+                document.getElementById('global-spinner').classList.add('active');
+            }
+
+            hideLoading() {
+                document.getElementById('global-spinner').classList.remove('active');
+            }
+
             showToast(message, type = "success") {
                 const toast = document.getElementById('toast');
                 const msg = document.getElementById('toast-msg');
