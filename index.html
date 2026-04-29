@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Technician Workspace | Rare Grade Tech</title>
+    <title>Technician & Developer Workspace | Rare Grade Tech</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -92,11 +92,11 @@
             <img src="https://i.postimg.cc/0N2N1P77/Whats-App-Image-2026-04-23-at-10-39-54.jpg" alt="Rare Grade Tech" class="w-10 h-10 rounded object-cover shadow-sm border border-slate-200">
             <div>
                 <h1 class="text-base font-extrabold text-slate-800 leading-tight">RARE GRADE TECH</h1>
-                <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Technician Workspace</p>
+                <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Workspace</p>
             </div>
         </div>
         <button onclick="techApp.resetToSearch()" class="text-slate-400 hover:text-slate-800 text-sm font-semibold transition-colors hidden" id="btn-back">
-            <i class="fa-solid fa-arrow-left mr-1"></i> Close Repair
+            <i class="fa-solid fa-arrow-left mr-1"></i> Back
         </button>
     </header>
 
@@ -122,6 +122,10 @@
             </div>
 
             <div class="w-full max-w-md shrink-0 mb-auto">
+                <button onclick="techApp.showProjectForm()" class="mb-8 w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-4 rounded-xl border border-blue-200 transition-all flex justify-center items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-laptop-code text-lg"></i> Add Developer Project
+                </button>
+
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2 px-1">
                     <i class="fa-solid fa-list-check text-amber-500"></i> Pending Repairs Queue
                 </h3>
@@ -129,6 +133,55 @@
                     </div>
             </div>
 
+        </div>
+
+        <div id="project-view" class="absolute inset-0 flex flex-col items-center pt-8 pb-12 overflow-y-auto px-6 bg-slate-50 transition-opacity duration-300 z-0 opacity-0 pointer-events-none">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 w-full max-w-2xl text-left shrink-0 mt-auto md:mt-10 mb-auto">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-100 pb-4">
+                    <i class="fa-solid fa-code text-blue-500 bg-blue-50 p-3 rounded-lg"></i> 
+                    New Developer Project
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Project Name</label>
+                        <input type="text" id="proj-name" class="custom-input" placeholder="e.g. CRM System">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Client / Internal</label>
+                        <input type="text" id="proj-client" class="custom-input" placeholder="e.g. Internal Tool or Client Name">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Core Tech Stack</label>
+                        <input type="text" id="proj-stack" class="custom-input" placeholder="e.g. Firebase, Mapbox, React, Tailwind">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Project Status</label>
+                        <select id="proj-status" class="custom-input font-bold text-slate-800 bg-slate-50 border-slate-300">
+                            <option value="Planning" class="text-slate-600">Planning & Architecture</option>
+                            <option value="Development" class="text-blue-600">Active Development</option>
+                            <option value="Testing" class="text-amber-600">Testing / QA Phase</option>
+                            <option value="Deployed" class="text-emerald-600">Deployed & Live</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Target Deadline</label>
+                        <input type="date" id="proj-deadline" class="custom-input">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Repository / Live Link</label>
+                        <input type="url" id="proj-link" class="custom-input" placeholder="https://github.com/...">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Project Scope / Description</label>
+                        <textarea id="proj-desc" class="custom-input h-32 resize-none text-sm leading-relaxed" placeholder="Describe the app's functionality, database models, and target goals..."></textarea>
+                    </div>
+                </div>
+
+                <button onclick="techApp.saveProject()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-lg"></i> Save Project Entry
+                </button>
+            </div>
         </div>
 
         <div id="workspace-view" class="absolute inset-0 flex flex-col md:flex-row opacity-0 pointer-events-none transition-opacity duration-300 z-0">
@@ -199,7 +252,7 @@
                 <div class="p-6 space-y-6 overflow-y-auto flex-1">
                     
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Technician Name</label>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Developer / Technician Name</label>
                         <input type="text" id="update-tech-name" class="custom-input" placeholder="e.g. Katlego" value="Katlego">
                     </div>
 
@@ -234,7 +287,7 @@
                 </div>
 
                 <div class="p-6 border-t border-slate-100 bg-white shrink-0">
-                    <button onclick="techApp.saveUpdate()" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
+                    <button onclick="techApp.saveUpdate()" class="w-full bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
                         <i class="fa-solid fa-cloud-arrow-up text-lg"></i> Save Record & Photos
                     </button>
                 </div>
@@ -269,7 +322,7 @@
                 this.currentDbKey = null;
 
                 this.initFirebase();
-                this.listenForPendingRepairs(); // Initialize real-time queue
+                this.listenForPendingRepairs();
                 this.setupEnterKey();
             }
 
@@ -341,7 +394,82 @@
             }
 
             // ==========================================
-            // STEP 1: FETCH & DISPLAY DATA
+            // DEVELOPER PROJECT FEATURE (New)
+            // ==========================================
+            showProjectForm() {
+                // Hide search view
+                document.getElementById('search-view').classList.add('opacity-0', 'pointer-events-none');
+                
+                // Show back button
+                const btnBack = document.getElementById('btn-back');
+                btnBack.classList.remove('hidden');
+                
+                // Fade in project view
+                setTimeout(() => {
+                    const pv = document.getElementById('project-view');
+                    pv.classList.remove('opacity-0', 'pointer-events-none');
+                    pv.classList.add('z-10');
+                }, 300);
+            }
+
+            async saveProject() {
+                const name = document.getElementById('proj-name').value.trim();
+                const client = document.getElementById('proj-client').value.trim();
+                const stack = document.getElementById('proj-stack').value.trim();
+                const status = document.getElementById('proj-status').value;
+                const deadline = document.getElementById('proj-deadline').value;
+                const link = document.getElementById('proj-link').value.trim();
+                const desc = document.getElementById('proj-desc').value.trim();
+                
+                // Tech Name taken from the existing input in the side panel or defaulted
+                const developerName = document.getElementById('update-tech-name').value || "Katlego";
+
+                if (!name) {
+                    this.showToast("Project Name is required", "error");
+                    return;
+                }
+
+                this.showLoading("Saving Software Project...");
+
+                const payload = {
+                    projectName: name,
+                    client: client,
+                    techStack: stack,
+                    status: status,
+                    deadline: deadline,
+                    link: link,
+                    description: desc,
+                    createdAt: Date.now(),
+                    developer: developerName
+                };
+
+                try {
+                    await this.db.ref('projects').push(payload);
+                    this.hideLoading();
+                    this.showToast("Project successfully added!");
+
+                    // Clear form
+                    document.getElementById('proj-name').value = '';
+                    document.getElementById('proj-client').value = '';
+                    document.getElementById('proj-stack').value = '';
+                    document.getElementById('proj-deadline').value = '';
+                    document.getElementById('proj-link').value = '';
+                    document.getElementById('proj-desc').value = '';
+
+                    setTimeout(() => {
+                        this.resetToSearch();
+                    }, 1500);
+
+                } catch (error) {
+                    console.error(error);
+                    this.hideLoading();
+                    this.showToast(error.message || "Failed to save project", "error");
+                }
+            }
+
+
+            // ==========================================
+            // STEP 1: FETCH & DISPLAY REPAIR DATA
             // ==========================================
             async fetchRepairRecord() {
                 let rawRef = document.getElementById('search-ref-id').value.trim().toUpperCase();
@@ -428,7 +556,7 @@
                 }
 
                 // Pre-fill Sidebar Form
-                document.getElementById('update-tech-name').value = rec.techName || "Katlego";
+                document.getElementById('update-tech-name').value = rec.techName || document.getElementById('update-tech-name').value;
                 document.getElementById('update-status').value = rec.status || 'Pending';
                 document.getElementById('update-notes').value = rec.techNotes || '';
                 document.getElementById('update-eta').value = rec.estimatedCompletionDate || '';
@@ -443,10 +571,17 @@
                 document.getElementById('search-ref-id').value = '';
                 document.getElementById('btn-back').classList.add('hidden');
 
+                // Hide Workspace View
                 const ws = document.getElementById('workspace-view');
                 ws.classList.add('opacity-0', 'pointer-events-none');
                 ws.classList.remove('z-10');
                 
+                // Hide Project View
+                const pv = document.getElementById('project-view');
+                pv.classList.add('opacity-0', 'pointer-events-none');
+                pv.classList.remove('z-10');
+                
+                // Show Main Search View
                 setTimeout(() => {
                     document.getElementById('search-view').classList.remove('opacity-0', 'pointer-events-none');
                 }, 300);
@@ -496,7 +631,7 @@
             }
 
             // ==========================================
-            // STEP 3: SAVE MASTER UPDATE
+            // STEP 3: SAVE REPAIR UPDATE
             // ==========================================
             async saveUpdate() {
                 if (!this.currentDbKey) return;
