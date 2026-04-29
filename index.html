@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Technician Workspace | Rare Grade Tech</title>
+    <title>Tech & Dev Workspace | Rare Grade Tech</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -92,53 +92,61 @@
             <img src="https://i.postimg.cc/0N2N1P77/Whats-App-Image-2026-04-23-at-10-39-54.jpg" alt="Rare Grade Tech" class="w-10 h-10 rounded object-cover shadow-sm border border-slate-200">
             <div>
                 <h1 class="text-base font-extrabold text-slate-800 leading-tight">RARE GRADE TECH</h1>
-                <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Technician Workspace</p>
+                <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Engineering & Tech Workspace</p>
             </div>
         </div>
         <button onclick="techApp.resetToSearch()" class="text-slate-400 hover:text-slate-800 text-sm font-semibold transition-colors hidden" id="btn-back">
-            <i class="fa-solid fa-arrow-left mr-1"></i> Close Repair
+            <i class="fa-solid fa-arrow-left mr-1"></i> Close Workspace
         </button>
     </header>
 
     <div class="flex-1 overflow-hidden relative">
 
-        <div id="search-view" class="absolute inset-0 flex flex-col items-center pt-8 pb-12 overflow-y-auto px-6 bg-slate-50 transition-opacity duration-300 z-10 gap-8">
+        <div id="search-view" class="absolute inset-0 flex flex-col items-center pt-8 pb-12 overflow-y-auto px-6 bg-slate-50 transition-opacity duration-300 z-10 gap-6">
             
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 w-full max-w-md text-center shrink-0 mt-auto md:mt-10">
-                <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div class="flex bg-slate-200 p-1 rounded-xl w-full max-w-md mx-auto shadow-inner">
+                <button id="tab-hardware" onclick="techApp.setMode('hardware')" class="flex-1 py-2.5 rounded-lg text-sm font-bold bg-white shadow text-slate-800 transition-all flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-screwdriver-wrench text-blue-500"></i> Hardware
+                </button>
+                <button id="tab-software" onclick="techApp.setMode('software')" class="flex-1 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-code text-purple-500"></i> Software
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 w-full max-w-md text-center shrink-0">
+                <div id="search-icon" class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors">
                     <i class="fa-solid fa-magnifying-glass text-2xl"></i>
                 </div>
-                <h2 class="text-xl font-bold text-slate-800 mb-2">Find Repair File</h2>
-                <p class="text-sm text-slate-500 mb-6">Enter the Reference ID to pull up the client's device details and upload evidence.</p>
+                <h2 id="search-title" class="text-xl font-bold text-slate-800 mb-2">Find Repair File</h2>
+                <p id="search-desc" class="text-sm text-slate-500 mb-6">Enter the Reference ID to pull up the client's device details.</p>
 
                 <div class="relative mb-6 text-left">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-mono font-bold">RGT-</span>
+                    <span id="search-prefix" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-mono font-bold">RGT-</span>
                     <input type="text" id="search-ref-id" class="w-full py-4 pl-14 pr-4 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-lg uppercase focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all" placeholder="1234" inputmode="numeric">
                 </div>
                 
-                <button onclick="techApp.fetchRepairRecord()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-md transition-all">
+                <button id="search-btn" onclick="techApp.fetchRecord()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-md transition-all">
                     Load Repair Data
                 </button>
             </div>
 
-            <div class="w-full max-w-md shrink-0 mb-auto">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2 px-1">
-                    <i class="fa-solid fa-list-check text-amber-500"></i> Pending Repairs Queue
+            <div class="w-full max-w-5xl shrink-0 mt-4">
+                <h3 id="queue-title" class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2 px-1">
+                    <i class="fa-solid fa-list-check text-amber-500"></i> Active Hardware Queue
                 </h3>
-                <div id="pending-queue-list" class="space-y-3">
+                <div id="queue-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     </div>
             </div>
 
         </div>
 
-        <div id="workspace-view" class="absolute inset-0 flex flex-col md:flex-row opacity-0 pointer-events-none transition-opacity duration-300 z-0">
-            
+        <div id="hardware-workspace" class="absolute inset-0 flex flex-col md:flex-row opacity-0 pointer-events-none transition-opacity duration-300 z-0">
             <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50">
                 <div class="max-w-3xl mx-auto space-y-6">
                     
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-1">Loaded Repair</p>
+                            <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-1">Hardware Repair</p>
                             <h2 class="text-2xl font-black text-slate-800 font-mono tracking-tight" id="disp-ref">RGT-0000</h2>
                             <p class="text-sm text-slate-500 mt-1"><i class="fa-solid fa-user text-slate-400 mr-1"></i> <span id="disp-client" class="font-semibold text-slate-700">Loading...</span></p>
                         </div>
@@ -170,15 +178,12 @@
 
                     <div id="existing-photos-container" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hidden">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4 border-b pb-2">Previously Attached Evidence</h3>
-                        <div id="existing-photo-gallery" class="grid grid-cols-4 gap-3">
-                            </div>
+                        <div id="existing-photo-gallery" class="grid grid-cols-4 gap-3"></div>
                     </div>
 
                     <div class="bg-white rounded-xl shadow-sm border border-blue-200 p-6">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 mb-4 flex items-center gap-2"><i class="fa-solid fa-camera"></i> Attach New Evidence</h3>
-                        
                         <input type="file" id="file-input" multiple accept="image/*" capture="environment" class="hidden" onchange="techApp.handleFiles(this)">
-                        
                         <div class="upload-zone border-blue-200 bg-blue-50/50" onclick="document.getElementById('file-input').click()">
                             <div class="w-14 h-14 bg-white text-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-blue-100">
                                 <i class="fa-solid fa-camera-retro text-xl"></i>
@@ -191,18 +196,15 @@
                 </div>
             </main>
 
-            <aside class="w-full md:w-[400px] bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-[-10px_0_20px_rgba(0,0,0,0.02)] z-10">
+            <aside class="w-full md:w-[400px] bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-[-10px_0_20px_rgba(0,0,0,0.02)]">
                 <div class="p-6 border-b border-slate-100 bg-slate-50">
-                    <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-screwdriver-wrench text-blue-500"></i> Technical Update Options</h2>
+                    <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-screwdriver-wrench text-blue-500"></i> Technical Update</h2>
                 </div>
-                
                 <div class="p-6 space-y-6 overflow-y-auto flex-1">
-                    
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Technician Name</label>
                         <input type="text" id="update-tech-name" class="custom-input" placeholder="e.g. Katlego" value="Katlego">
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Update Repair Status</label>
                         <select id="update-status" class="custom-input font-bold text-slate-800 bg-slate-50 border-slate-300">
@@ -214,39 +216,111 @@
                             <option value="Failed to Repair" class="text-red-600 font-bold">⚠️ Failed to Repair (Irreparable)</option>
                         </select>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Duration / Estimated Date</label>
                         <input type="date" id="update-eta" class="custom-input">
-                        <p class="text-[10px] text-slate-400 mt-1">When will the device be ready?</p>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Diagnosis / Work Notes</label>
                         <textarea id="update-notes" class="custom-input h-24 resize-none text-sm leading-relaxed" placeholder="Describe the diagnosis, the fix applied, or the parts required..."></textarea>
                     </div>
-
                     <div>
-                        <label class="block text-xs font-bold text-red-700 uppercase tracking-wider mb-2">Technician Final Comments / Reason for Failure</label>
-                        <textarea id="update-tech-comments" class="custom-input h-24 border-red-100 bg-red-50/30 resize-none text-sm leading-relaxed" placeholder="If the repair failed, explain why here (e.g. Board damage, part unavailable)..."></textarea>
-                        <p class="text-[10px] text-slate-400 mt-1">This info helps when explaining the outcome to the client.</p>
+                        <label class="block text-xs font-bold text-red-700 uppercase tracking-wider mb-2">Reason for Failure (If applicable)</label>
+                        <textarea id="update-tech-comments" class="custom-input h-20 border-red-100 bg-red-50/30 resize-none text-sm leading-relaxed" placeholder="Explain failure reason..."></textarea>
                     </div>
                 </div>
-
                 <div class="p-6 border-t border-slate-100 bg-white shrink-0">
-                    <button onclick="techApp.saveUpdate()" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
+                    <button onclick="techApp.saveHardwareUpdate()" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
                         <i class="fa-solid fa-cloud-arrow-up text-lg"></i> Save Record & Photos
                     </button>
                 </div>
             </aside>
+        </div>
 
+        <div id="software-workspace" class="absolute inset-0 flex flex-col md:flex-row opacity-0 pointer-events-none transition-opacity duration-300 z-0">
+            <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50">
+                <div class="max-w-4xl mx-auto space-y-6">
+                    
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <p class="text-[10px] text-purple-600 font-bold uppercase tracking-widest mb-1">Software Project</p>
+                            <h2 class="text-2xl font-black text-slate-800 font-mono tracking-tight" id="soft-disp-ref">SFT-0000</h2>
+                            <h3 class="text-lg font-bold text-slate-700 mt-1" id="soft-disp-project">Project Name</h3>
+                            <p class="text-sm text-slate-500 mt-1"><i class="fa-solid fa-building text-slate-400 mr-1"></i> <span id="soft-disp-client">Client Name</span></p>
+                        </div>
+                        <div class="bg-slate-50 px-4 py-3 rounded-lg border border-slate-100 text-right w-full md:w-auto">
+                            <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Pipeline Status</p>
+                            <p class="font-bold text-purple-700" id="soft-disp-status">Requirements Gathering</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4 border-b pb-2">Technical Specifications</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Target Platform</span>
+                                <p class="font-medium text-slate-800 mt-1" id="soft-disp-platform">---</p>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Preferred Stack</span>
+                                <p class="font-mono text-sm text-slate-800 mt-1" id="soft-disp-stack">---</p>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Deadline</span>
+                                <p class="font-medium text-red-600 mt-1" id="soft-disp-deadline">---</p>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Repository Link</span>
+                                <a href="#" target="_blank" id="soft-disp-repo" class="text-sm font-medium text-blue-600 hover:underline mt-1 block truncate">---</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4 border-b pb-2">Core Requirements & Business Logic</h3>
+                        <div class="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-100" id="soft-disp-requirements">---</div>
+                    </div>
+
+                </div>
+            </main>
+
+            <aside class="w-full md:w-[400px] bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-[-10px_0_20px_rgba(0,0,0,0.02)]">
+                <div class="p-6 border-b border-slate-100 bg-slate-50">
+                    <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-terminal text-purple-500"></i> Developer Controls</h2>
+                </div>
+                <div class="p-6 space-y-6 overflow-y-auto flex-1">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Assigned Developer</label>
+                        <input type="text" id="update-soft-dev" class="custom-input" placeholder="e.g. Katlego" value="Katlego">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Update Project Phase</label>
+                        <select id="update-soft-status" class="custom-input font-bold text-slate-800 bg-slate-50 border-slate-300">
+                            <option value="Requirements Gathering" class="text-slate-600">Requirements Gathering</option>
+                            <option value="UI/UX Design" class="text-purple-600">UI/UX Design</option>
+                            <option value="In Development" class="text-blue-600">In Development</option>
+                            <option value="Testing & QA" class="text-amber-600">Testing & QA</option>
+                            <option value="Deployed / Completed" class="text-emerald-600">Deployed / Completed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Development Notes / Commits</label>
+                        <textarea id="update-soft-notes" class="custom-input h-48 resize-none text-sm leading-relaxed" placeholder="Log progress, milestone completions, or specific API/Repo changes..."></textarea>
+                    </div>
+                </div>
+                <div class="p-6 border-t border-slate-100 bg-white shrink-0">
+                    <button onclick="techApp.saveSoftwareUpdate()" class="w-full bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-code-commit text-lg"></i> Push Status Update
+                    </button>
+                </div>
+            </aside>
         </div>
 
     </div>
 
     <script>
         // ==========================================
-        // CONFIGURATION (Injected directly)
+        // CONFIGURATION
         // ==========================================
         const FIREBASE_CONFIG = {
             apiKey: "AIzaSyCh7Ute6LeSAxcNDEQwZg5m0cA4ujnLCfg",
@@ -263,13 +337,20 @@
 
         class TechnicianPortal {
             constructor() {
-                this.selectedFiles = [];
+                this.currentMode = 'hardware'; // 'hardware' or 'software'
                 this.db = null;
-                this.currentRecord = null; 
+                
+                // Data Storage
+                this.hardwareData = [];
+                this.softwareData = [];
+                
+                // Active workspace state
                 this.currentDbKey = null;
+                this.currentRecord = null; 
+                this.selectedFiles = [];
 
                 this.initFirebase();
-                this.listenForPendingRepairs(); // Initialize real-time queue
+                this.listenForData();
                 this.setupEnterKey();
             }
 
@@ -279,87 +360,178 @@
             }
 
             // ==========================================
-            // QUEUE LISTENER: Fetch Pending Devices
+            // REAL-TIME DATA SYNC & QUEUE RENDERING
             // ==========================================
-            listenForPendingRepairs() {
-                this.db.ref('reports').orderByChild('status').equalTo('Pending').on('value', (snapshot) => {
-                    const queueList = document.getElementById('pending-queue-list');
-                    if (!queueList) return;
-
-                    queueList.innerHTML = '';
-
-                    if (!snapshot.exists()) {
-                        queueList.innerHTML = `
-                            <div class="bg-white rounded-xl border border-slate-200 p-6 text-center text-slate-500 text-sm border-dashed">
-                                You're all caught up! No pending repairs.
-                            </div>`;
-                        return;
-                    }
-
-                    let pendingItems = [];
-                    snapshot.forEach(childSnapshot => {
-                        pendingItems.push(childSnapshot.val());
+            listenForData() {
+                // Hardware Queue (Ignore fully completed/collected devices in the pending view)
+                this.db.ref('reports').on('value', snap => {
+                    this.hardwareData = [];
+                    snap.forEach(child => {
+                        let val = child.val();
+                        val.key = child.key;
+                        if(val.status !== 'Completed & Collected' && val.status !== 'Failed to Repair') {
+                            this.hardwareData.push(val);
+                        }
                     });
+                    this.hardwareData.sort((a,b) => b.timestamp - a.timestamp);
+                    if(this.currentMode === 'hardware') this.renderQueue();
+                });
 
-                    // Reverse array to show newest IDs at the top
-                    pendingItems.reverse();
+                // Software Queue (Ignore fully deployed projects)
+                this.db.ref('software_projects').on('value', snap => {
+                    this.softwareData = [];
+                    snap.forEach(child => {
+                        let val = child.val();
+                        val.key = child.key;
+                        if(val.status !== 'Deployed / Completed') {
+                            this.softwareData.push(val);
+                        }
+                    });
+                    this.softwareData.sort((a,b) => b.timestamp - a.timestamp);
+                    if(this.currentMode === 'software') this.renderQueue();
+                });
+            }
 
-                    pendingItems.forEach(rec => {
-                        const item = document.createElement('div');
-                        item.className = "bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center justify-between hover:border-blue-400 hover:shadow-md cursor-pointer transition-all group";
-                        
-                        // Click to auto-load the workspace
-                        item.onclick = () => {
-                            document.getElementById('search-ref-id').value = rec.refId;
-                            this.fetchRepairRecord();
-                        };
+            setMode(mode) {
+                this.currentMode = mode;
+                
+                const tabHW = document.getElementById('tab-hardware');
+                const tabSW = document.getElementById('tab-software');
+                const searchIcon = document.getElementById('search-icon');
+                const btnLoad = document.getElementById('search-btn');
 
-                        item.innerHTML = `
-                            <div class="flex items-center gap-4">
-                                <div class="w-1.5 h-10 bg-amber-400 rounded-full"></div>
-                                <div class="text-left">
-                                    <h4 class="font-bold text-slate-800 font-mono text-sm leading-tight">RGT-${rec.refId}</h4>
-                                    <p class="text-[11px] text-slate-500 truncate max-w-[200px] uppercase font-semibold mt-0.5">${rec.device || 'Unknown Device'} • ${rec.clientName || 'Client'}</p>
-                                </div>
+                if (mode === 'hardware') {
+                    // UI styling for tabs
+                    tabHW.className = "flex-1 py-2.5 rounded-lg text-sm font-bold bg-white shadow text-slate-800 transition-all flex justify-center items-center gap-2";
+                    tabSW.className = "flex-1 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all flex justify-center items-center gap-2";
+                    
+                    // Search UI updates
+                    document.getElementById('search-title').innerText = "Find Repair File";
+                    document.getElementById('search-desc').innerText = "Enter the Reference ID to pull up the client's device details.";
+                    document.getElementById('search-prefix').innerText = "RGT-";
+                    searchIcon.className = "w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors";
+                    searchIcon.innerHTML = '<i class="fa-solid fa-screwdriver-wrench text-2xl"></i>';
+                    btnLoad.innerText = "Load Repair Data";
+
+                    // Queue Title
+                    document.getElementById('queue-title').innerHTML = '<i class="fa-solid fa-list-check text-amber-500"></i> Active Hardware Queue';
+
+                } else {
+                    // UI styling for tabs
+                    tabSW.className = "flex-1 py-2.5 rounded-lg text-sm font-bold bg-white shadow text-slate-800 transition-all flex justify-center items-center gap-2";
+                    tabHW.className = "flex-1 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all flex justify-center items-center gap-2";
+                    
+                    // Search UI updates
+                    document.getElementById('search-title').innerText = "Find Software Project";
+                    document.getElementById('search-desc').innerText = "Enter the Project ID to access repo links and specs.";
+                    document.getElementById('search-prefix').innerText = "SFT-";
+                    searchIcon.className = "w-16 h-16 bg-purple-50 text-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors";
+                    searchIcon.innerHTML = '<i class="fa-solid fa-laptop-code text-2xl"></i>';
+                    btnLoad.innerText = "Load Software Pipeline";
+
+                    // Queue Title
+                    document.getElementById('queue-title').innerHTML = '<i class="fa-solid fa-code-branch text-purple-500"></i> Active Software Projects';
+                }
+
+                document.getElementById('search-ref-id').value = '';
+                this.renderQueue();
+            }
+
+            renderQueue() {
+                const grid = document.getElementById('queue-grid');
+                grid.innerHTML = '';
+                
+                const dataArray = this.currentMode === 'hardware' ? this.hardwareData : this.softwareData;
+
+                if (dataArray.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-500 text-sm border-dashed">You're all caught up! No active tasks in this view.</div>`;
+                    return;
+                }
+
+                dataArray.forEach(rec => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:border-blue-400 hover:shadow-md cursor-pointer transition-all flex flex-col h-full";
+                    
+                    card.onclick = () => {
+                        document.getElementById('search-ref-id').value = rec.refId;
+                        this.fetchRecord();
+                    };
+
+                    if (this.currentMode === 'hardware') {
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="font-mono text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">RGT-${rec.refId}</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">${rec.status}</span>
                             </div>
-                            <div class="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-blue-500 group-hover:bg-blue-50 transition-colors">
-                                <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
+                            <h4 class="font-bold text-slate-800 text-sm truncate">${rec.device || 'Unknown Device'}</h4>
+                            <p class="text-xs text-slate-500 mt-1 truncate"><i class="fa-solid fa-user mr-1 text-slate-400"></i> ${rec.clientName}</p>
+                            <div class="mt-auto pt-4 flex justify-between items-center text-xs">
+                                <span class="text-slate-400">${this.timeAgo(rec.timestamp)}</span>
+                                <i class="fa-solid fa-arrow-right text-slate-300"></i>
                             </div>
                         `;
-                        queueList.appendChild(item);
-                    });
+                    } else {
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="font-mono text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded">SFT-${rec.refId}</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">${rec.status}</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm truncate">${rec.projectName || 'Unnamed Project'}</h4>
+                            <p class="text-xs text-slate-500 mt-1 truncate"><i class="fa-solid fa-building mr-1 text-slate-400"></i> ${rec.clientName}</p>
+                            <div class="mt-auto pt-4 flex justify-between items-center text-xs">
+                                <span class="text-slate-400 font-medium">${rec.platform}</span>
+                                <i class="fa-solid fa-code text-slate-300"></i>
+                            </div>
+                        `;
+                    }
+                    grid.appendChild(card);
                 });
+            }
+
+            timeAgo(timestamp) {
+                if(!timestamp) return '';
+                const diff = Date.now() - timestamp;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                if(days === 0) return 'Today';
+                if(days === 1) return 'Yesterday';
+                return `${days} days ago`;
             }
 
             setupEnterKey() {
                 document.getElementById('search-ref-id').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
                         e.preventDefault();
-                        this.fetchRepairRecord();
+                        this.fetchRecord();
                     }
                 });
             }
 
             // ==========================================
-            // STEP 1: FETCH & DISPLAY DATA
+            // FETCH & DISPLAY WORKSPACE
             // ==========================================
-            async fetchRepairRecord() {
+            async fetchRecord() {
                 let rawRef = document.getElementById('search-ref-id').value.trim().toUpperCase();
+                
+                // Cleanup prefix if accidentally typed
                 if (rawRef.startsWith('RGT-')) rawRef = rawRef.replace('RGT-', '');
+                if (rawRef.startsWith('SFT-')) rawRef = rawRef.replace('SFT-', '');
                 
                 if (!rawRef) {
-                    this.showToast("Please enter a Reference ID", "error");
+                    this.showToast("Please enter a valid ID", "error");
                     return;
                 }
 
                 this.showLoading("Searching Database...");
 
+                const collection = this.currentMode === 'hardware' ? 'reports' : 'software_projects';
+                
                 try {
-                    const snapshot = await this.db.ref('reports').orderByChild('refId').equalTo(rawRef).once('value');
+                    const snapshot = await this.db.ref(collection).orderByChild('refId').equalTo(rawRef).once('value');
                     
                     if (!snapshot.exists()) {
                         this.hideLoading();
-                        this.showToast(`Repair RGT-${rawRef} not found.`, "error");
+                        const prefix = this.currentMode === 'hardware' ? 'RGT' : 'SFT';
+                        this.showToast(`Record ${prefix}-${rawRef} not found.`, "error");
                         return;
                     }
 
@@ -368,47 +540,70 @@
                         this.currentRecord = childSnapshot.val();
                     });
 
-                    this.populateWorkspace();
-                    this.hideLoading();
+                    if(this.currentMode === 'hardware') {
+                        this.populateHardwareWorkspace();
+                    } else {
+                        this.populateSoftwareWorkspace();
+                    }
 
-                    // UI Transition
-                    document.getElementById('search-view').classList.add('opacity-0', 'pointer-events-none');
-                    document.getElementById('btn-back').classList.remove('hidden');
-                    
-                    setTimeout(() => {
-                        const ws = document.getElementById('workspace-view');
-                        ws.classList.remove('opacity-0', 'pointer-events-none');
-                        ws.classList.add('z-10');
-                    }, 300);
+                    this.hideLoading();
+                    this.openWorkspace();
 
                 } catch (error) {
                     console.error(error);
                     this.hideLoading();
-                    this.showToast(error.message || "Database connection error", "error");
+                    this.showToast("Database connection error", "error");
                 }
             }
 
-            populateWorkspace() {
-                const rec = this.currentRecord;
+            openWorkspace() {
+                document.getElementById('search-view').classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('btn-back').classList.remove('hidden');
                 
-                // Read Only Data
+                setTimeout(() => {
+                    const targetWS = this.currentMode === 'hardware' ? 'hardware-workspace' : 'software-workspace';
+                    const ws = document.getElementById(targetWS);
+                    ws.classList.remove('opacity-0', 'pointer-events-none');
+                    ws.classList.add('z-10');
+                }, 300);
+            }
+
+            resetToSearch() {
+                this.currentRecord = null;
+                this.currentDbKey = null;
+                this.selectedFiles = [];
+                document.getElementById('preview-grid').innerHTML = '';
+                document.getElementById('search-ref-id').value = '';
+                document.getElementById('btn-back').classList.add('hidden');
+
+                document.getElementById('hardware-workspace').classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('hardware-workspace').classList.remove('z-10');
+                document.getElementById('software-workspace').classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('software-workspace').classList.remove('z-10');
+                
+                setTimeout(() => {
+                    document.getElementById('search-view').classList.remove('opacity-0', 'pointer-events-none');
+                }, 300);
+            }
+
+            // --- HARDWARE WORKSPACE DATA ---
+            populateHardwareWorkspace() {
+                const rec = this.currentRecord;
                 document.getElementById('disp-ref').innerText = `RGT-${rec.refId}`;
                 document.getElementById('disp-client').innerText = rec.clientName || 'Unknown';
                 document.getElementById('disp-device').innerText = rec.device || 'Not specified';
                 document.getElementById('disp-issue').innerText = rec.issue || 'No issue recorded.';
                 document.getElementById('disp-status').innerText = rec.status || 'Pending';
 
-                // Checkboxes
                 const setIcon = (id, condition) => {
                     const el = document.getElementById(id);
-                    if(condition) { el.className = "fa-solid fa-square-check text-blue-500"; } 
-                    else { el.className = "fa-regular fa-square text-slate-300"; }
+                    if(condition) el.className = "fa-solid fa-square-check text-blue-500"; 
+                    else el.className = "fa-regular fa-square text-slate-300";
                 };
                 setIcon('disp-chk-power', rec.checks?.power);
                 setIcon('disp-chk-cracks', rec.checks?.cracks);
                 setIcon('disp-chk-data', rec.checks?.dataWaiver);
 
-                // Populate Existing Photos Gallery
                 const galleryContainer = document.getElementById('existing-photos-container');
                 const galleryGrid = document.getElementById('existing-photo-gallery');
                 
@@ -427,7 +622,6 @@
                     galleryGrid.innerHTML = '';
                 }
 
-                // Pre-fill Sidebar Form
                 document.getElementById('update-tech-name').value = rec.techName || "Katlego";
                 document.getElementById('update-status').value = rec.status || 'Pending';
                 document.getElementById('update-notes').value = rec.techNotes || '';
@@ -435,25 +629,39 @@
                 document.getElementById('update-tech-comments').value = rec.techComments || '';
             }
 
-            resetToSearch() {
-                this.currentRecord = null;
-                this.currentDbKey = null;
-                this.selectedFiles = [];
-                document.getElementById('preview-grid').innerHTML = '';
-                document.getElementById('search-ref-id').value = '';
-                document.getElementById('btn-back').classList.add('hidden');
-
-                const ws = document.getElementById('workspace-view');
-                ws.classList.add('opacity-0', 'pointer-events-none');
-                ws.classList.remove('z-10');
+            // --- SOFTWARE WORKSPACE DATA ---
+            populateSoftwareWorkspace() {
+                const rec = this.currentRecord;
+                document.getElementById('soft-disp-ref').innerText = `SFT-${rec.refId}`;
+                document.getElementById('soft-disp-project').innerText = rec.projectName || 'Unnamed Project';
+                document.getElementById('soft-disp-client').innerText = rec.clientName || 'Unknown Client';
+                document.getElementById('soft-disp-status').innerText = rec.status || 'Requirements Gathering';
                 
-                setTimeout(() => {
-                    document.getElementById('search-view').classList.remove('opacity-0', 'pointer-events-none');
-                }, 300);
+                document.getElementById('soft-disp-platform').innerText = rec.platform || 'Not specified';
+                document.getElementById('soft-disp-stack').innerText = rec.techStack || 'TBD';
+                document.getElementById('soft-disp-deadline').innerText = rec.deadline || 'No specific date';
+                document.getElementById('soft-disp-requirements').innerText = rec.requirements || 'No specific requirements described.';
+
+                const repoEl = document.getElementById('soft-disp-repo');
+                if (rec.repoLink) {
+                    repoEl.href = rec.repoLink;
+                    repoEl.innerText = rec.repoLink;
+                    repoEl.classList.remove('text-slate-400', 'pointer-events-none');
+                    repoEl.classList.add('text-blue-600');
+                } else {
+                    repoEl.removeAttribute('href');
+                    repoEl.innerText = "No repository attached";
+                    repoEl.classList.add('text-slate-400', 'pointer-events-none');
+                    repoEl.classList.remove('text-blue-600');
+                }
+
+                document.getElementById('update-soft-dev').value = rec.devAssigned || "Katlego";
+                document.getElementById('update-soft-status').value = rec.status || 'Requirements Gathering';
+                document.getElementById('update-soft-notes').value = rec.devNotes || '';
             }
 
             // ==========================================
-            // STEP 2: FILE HANDLING (New Photos)
+            // FILE HANDLING (HARDWARE ONLY)
             // ==========================================
             handleFiles(input) {
                 if (input.files) {
@@ -491,14 +699,14 @@
                     return data.secure_url;
                 } catch (err) {
                     console.error("Cloudinary error:", err);
-                    return null; // Don't crash save process
+                    return null; 
                 }
             }
 
             // ==========================================
-            // STEP 3: SAVE MASTER UPDATE
+            // SAVING UPDATES (HARDWARE)
             // ==========================================
-            async saveUpdate() {
+            async saveHardwareUpdate() {
                 if (!this.currentDbKey) return;
 
                 const techName = document.getElementById('update-tech-name').value;
@@ -510,7 +718,6 @@
                 this.showLoading("Processing Report...");
 
                 try {
-                    // 1. Upload new photos to Cloudinary if they exist
                     let newUrls = [];
                     if (this.selectedFiles.length > 0) {
                         this.showLoading(`Uploading ${this.selectedFiles.length} Photo(s)...`);
@@ -520,13 +727,10 @@
                         }
                     }
 
-                    this.showLoading("Saving Report Data...");
-
-                    // 2. Merge photos
+                    this.showLoading("Saving Hardware Data...");
                     let existingPhotos = this.currentRecord.photos || [];
                     let mergedPhotos = [...existingPhotos, ...newUrls];
 
-                    // 3. Prepare payload
                     let updatePayload = {
                         techName: techName,
                         status: status,
@@ -537,46 +741,61 @@
                         lastUpdated: Date.now()
                     };
 
-                    // If status is fully completed, stamp the collection date too
                     if(status === 'Completed & Collected') {
                         updatePayload.dateCollected = Date.now();
                     }
 
-                    // 4. Push to Firebase
                     await this.db.ref('reports/' + this.currentDbKey).update(updatePayload);
 
                     this.hideLoading();
-                    this.showToast("Report successfully updated!");
-                    
-                    // Return to start
-                    setTimeout(() => {
-                        this.resetToSearch();
-                    }, 1500);
+                    this.showToast("Hardware Record updated!");
+                    setTimeout(() => this.resetToSearch(), 1500);
 
                 } catch (error) {
-                    console.error(error);
                     this.hideLoading();
-                    this.showToast(error.message || "Failed to save update", "error");
+                    this.showToast("Failed to save update", "error");
+                }
+            }
+
+            // ==========================================
+            // SAVING UPDATES (SOFTWARE)
+            // ==========================================
+            async saveSoftwareUpdate() {
+                if (!this.currentDbKey) return;
+
+                const devAssigned = document.getElementById('update-soft-dev').value;
+                const status = document.getElementById('update-soft-status').value;
+                const devNotes = document.getElementById('update-soft-notes').value;
+
+                this.showLoading("Pushing Code Status...");
+
+                try {
+                    let updatePayload = {
+                        devAssigned: devAssigned,
+                        status: status,
+                        devNotes: devNotes,
+                        lastUpdated: Date.now()
+                    };
+
+                    await this.db.ref('software_projects/' + this.currentDbKey).update(updatePayload);
+
+                    this.hideLoading();
+                    this.showToast("Software Pipeline updated!");
+                    setTimeout(() => this.resetToSearch(), 1500);
+
+                } catch (error) {
+                    this.hideLoading();
+                    this.showToast("Failed to sync project", "error");
                 }
             }
 
             // ==========================================
             // UTILITIES
             // ==========================================
-            showLoading(text) {
-                document.getElementById('spinner-text').innerText = text;
-                document.getElementById('global-spinner').classList.add('active');
-            }
-
-            hideLoading() {
-                document.getElementById('global-spinner').classList.remove('active');
-            }
-
             showToast(message, type = "success") {
                 const toast = document.getElementById('toast');
                 const msg = document.getElementById('toast-msg');
                 const icon = document.getElementById('toast-icon');
-
                 msg.innerText = message;
                 
                 if (type === "error") {
