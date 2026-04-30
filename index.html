@@ -16,7 +16,7 @@
         :root {
             --brand-primary: #0f172a;
             --brand-accent: #2563eb;
-            --bg-body: #e2e8f0; /* Darker slate to make the white modal pop */
+            --bg-body: #e2e8f0; 
         }
 
         /* Prevent body scroll entirely */
@@ -217,24 +217,29 @@
                                 <span class="text-[10px] font-bold text-slate-500 uppercase ml-1">Device Model</span>
                                 <input type="text" id="disp-device" class="custom-input py-3 mt-1 bg-white border-slate-200 font-medium text-slate-800 text-base rounded-xl">
                                 
-                                <div class="mt-4 flex items-center gap-3">
+                                <div class="mt-4 flex items-center gap-3 relative">
                                     <span class="text-[10px] font-bold text-slate-500 uppercase ml-1">Color:</span>
-                                    <input type="text" id="disp-color" class="custom-input py-2 px-3 text-sm bg-white border-slate-200 rounded-lg">
+                                    <div class="flex-1 relative">
+                                        <input type="text" id="disp-color" class="custom-input py-2 px-3 pl-10 text-sm bg-white border-slate-200 rounded-lg" onkeyup="techApp.updateColorPreview()">
+                                        <div id="color-preview-block" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border border-slate-300 bg-transparent shadow-inner"></div>
+                                    </div>
                                 </div>
                                 
                                 <!-- TECH CHARGER EDIT -->
-                                <div class="mt-5 flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                    <label class="flex items-center gap-2 cursor-pointer w-full">
-                                        <input type="checkbox" id="disp-chk-charger" class="w-4 h-4 text-blue-600 rounded" onchange="techApp.toggleTechCharger()">
+                                <div class="mt-5 bg-slate-50 p-3.5 rounded-xl border border-slate-100 transition-all duration-300">
+                                    <label class="flex items-center gap-3 cursor-pointer">
+                                        <input type="checkbox" id="disp-chk-charger" class="w-5 h-5 text-blue-600 rounded border-slate-300 shadow-sm" onchange="techApp.toggleTechCharger()">
                                         <span class="text-xs font-bold text-slate-700 uppercase">Charger Included?</span>
                                     </label>
-                                    <input type="text" id="disp-charger-specs" class="custom-input py-1.5 px-3 text-xs flex-1 hidden border-blue-200 rounded-lg bg-white" placeholder="Specs (e.g. 65W)">
+                                    <div id="charger-specs-container" class="mt-3 hidden animate-fade-in-up" style="animation-duration: 0.2s;">
+                                        <input type="text" id="disp-charger-specs" class="custom-input py-2.5 px-3 text-xs border-blue-200 rounded-lg bg-white w-full shadow-sm" placeholder="Enter Charger Specs (e.g. 65W Dell Type-C)">
+                                    </div>
                                 </div>
 
                             </div>
                             <div>
                                 <span class="text-[10px] font-bold text-slate-500 uppercase ml-1">Reported Issue</span>
-                                <textarea id="disp-issue" class="custom-input py-3 px-4 text-sm mt-1 h-32 resize-none bg-white border-slate-200 rounded-xl"></textarea>
+                                <textarea id="disp-issue" class="custom-input py-3 px-4 text-sm mt-1 h-36 resize-none bg-white border-slate-200 rounded-xl"></textarea>
                             </div>
                         </div>
                         
@@ -911,13 +916,35 @@
 
             toggleTechCharger() {
                 const chk = document.getElementById('disp-chk-charger').checked;
+                const container = document.getElementById('charger-specs-container');
                 const specInput = document.getElementById('disp-charger-specs');
+                
                 if (chk) {
-                    specInput.classList.remove('hidden');
+                    container.classList.remove('hidden');
+                    specInput.focus();
                 } else {
-                    specInput.classList.add('hidden');
+                    container.classList.add('hidden');
                     specInput.value = '';
                 }
+            }
+
+            updateColorPreview() {
+                const val = document.getElementById('disp-color').value.toLowerCase().trim();
+                const block = document.getElementById('color-preview-block');
+                
+                // Map common tech colors to hex for accurate preview
+                const colorMap = {
+                    'space gray': '#535150',
+                    'space grey': '#535150',
+                    'silver': '#c0c0c0',
+                    'rose gold': '#b76e79',
+                    'midnight': '#191f28',
+                    'starlight': '#f9f6ef',
+                    'graphite': '#3f3f3f',
+                    'matte black': '#28282b'
+                };
+                
+                block.style.backgroundColor = colorMap[val] || val;
             }
 
             populateHardwareDisplayOnly() {
@@ -927,23 +954,27 @@
                 
                 // Allow tech to edit values directly
                 document.getElementById('disp-device').value = rec.device || '';
-                document.getElementById('disp-color').value = rec.color || '';
                 document.getElementById('disp-issue').value = rec.issue || '';
                 document.getElementById('disp-status').innerText = rec.status || 'Pending';
 
+                // Color preview logic
+                document.getElementById('disp-color').value = rec.color || '';
+                this.updateColorPreview();
+
                 // Charger UI update - Tech Edit Sync
                 const chargerChk = document.getElementById('disp-chk-charger');
+                const chargerContainer = document.getElementById('charger-specs-container');
                 const chargerSpecs = document.getElementById('disp-charger-specs');
                 
                 if (rec.charger) {
                     chargerChk.checked = rec.charger.included || false;
                     chargerSpecs.value = rec.charger.specs || '';
-                    if(chargerChk.checked) chargerSpecs.classList.remove('hidden');
-                    else chargerSpecs.classList.add('hidden');
+                    if(chargerChk.checked) chargerContainer.classList.remove('hidden');
+                    else chargerContainer.classList.add('hidden');
                 } else {
                     chargerChk.checked = false;
                     chargerSpecs.value = '';
-                    chargerSpecs.classList.add('hidden');
+                    chargerContainer.classList.add('hidden');
                 }
 
                 const setIcon = (id, condition) => {
