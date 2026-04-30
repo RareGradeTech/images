@@ -1243,6 +1243,42 @@
             }
 
             // ==========================================
+            // MISSING HELPER FUNCTIONS FOR SAVING
+            // ==========================================
+            getPartData(partId, fields) {
+                const cb = document.getElementById(`part-${partId}`);
+                if (!cb || !cb.checked) return false;
+
+                let data = { needed: true };
+                fields.forEach(f => {
+                    const el = document.getElementById(`part-${partId}-${f}`);
+                    if (el) {
+                        data[f] = el.type === 'checkbox' ? el.checked : el.value.trim();
+                    }
+                });
+                return data;
+            }
+
+            async uploadToCloudinary(file) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', CLOUDINARY_PRESET);
+
+                try {
+                    const res = await fetch(CLOUDINARY_URL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!res.ok) throw new Error("Upload failed");
+                    const data = await res.json();
+                    return data.secure_url;
+                } catch (err) {
+                    console.error("Cloudinary error:", err);
+                    return null;
+                }
+            }
+
+            // ==========================================
             // SAVING LOGIC (Executed AFTER Signoff)
             // ==========================================
             async executeHardwareSave(empKey, empData) {
@@ -1291,7 +1327,7 @@
 
                 try {
                     let newBeforeUrls = [];
-                    if (this.selectedFilesBefore.length > 0) {
+                    if (this.selectedFilesBefore && this.selectedFilesBefore.length > 0) {
                         this.showLoading(`Uploading Pre-Repair Photos...`);
                         for (let file of this.selectedFilesBefore) {
                             const url = await this.uploadToCloudinary(file);
@@ -1300,7 +1336,7 @@
                     }
 
                     let newAfterUrls = [];
-                    if (this.selectedFilesAfter.length > 0) {
+                    if (this.selectedFilesAfter && this.selectedFilesAfter.length > 0) {
                         this.showLoading(`Uploading Post-Repair Photos...`);
                         for (let file of this.selectedFilesAfter) {
                             const url = await this.uploadToCloudinary(file);
