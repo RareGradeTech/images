@@ -219,7 +219,6 @@
                         </div>
                     </div>
 
-                    <!-- EDITABLE DEVICE DETAILS (with oninput modified flags to prevent overwrite) -->
                     <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 w-full">
                         <h3 class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-400 mb-4 sm:mb-6 border-b border-slate-100 pb-3">Edit Device & Fault Details</h3>
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 w-full">
@@ -264,7 +263,6 @@
                         </div>
                     </div>
 
-                    <!-- REALTIME IMAGES RENDER HERE -->
                     <div id="existing-photos-container" class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 hidden space-y-6 sm:space-y-8 w-full">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-2 sm:pb-3">
                             <h3 class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-400">Captured Evidence</h3>
@@ -456,13 +454,19 @@
                 <div class="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6">
                     
                     <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6 w-full">
-                        <div>
+                        <div class="flex-1 w-full">
                             <p class="text-[10px] sm:text-[11px] text-purple-600 font-black uppercase tracking-widest mb-1 sm:mb-2">Software Project</p>
                             <h2 class="text-2xl sm:text-3xl font-black text-slate-800 font-mono tracking-tight" id="soft-disp-ref">SFT-0000</h2>
-                            <h3 class="text-lg sm:text-xl font-black text-slate-700 mt-1 sm:mt-2" id="soft-disp-project">Project Name</h3>
-                            <p class="text-xs sm:text-sm font-medium text-slate-500 mt-1 sm:mt-2"><i class="fa-solid fa-building text-slate-400 mr-2"></i> <span id="soft-disp-client">Client Name</span></p>
+                            
+                            <!-- ALL FIELDS FULLY EDITABLE WITH DATA-MODIFIED TRACKING -->
+                            <input type="text" id="soft-disp-project" class="custom-input text-lg sm:text-xl font-black text-slate-700 mt-2 w-full border-transparent hover:border-slate-200 focus:bg-white transition-all shadow-none px-2 py-1" placeholder="Project Name" oninput="this.dataset.modified='true'">
+                            
+                            <div class="flex items-center mt-1 w-full">
+                                <i class="fa-solid fa-building text-slate-400 mr-2 ml-2"></i>
+                                <input type="text" id="soft-disp-client" class="custom-input text-xs sm:text-sm font-medium text-slate-500 w-full border-transparent hover:border-slate-200 focus:bg-white transition-all shadow-none px-2 py-1" placeholder="Client Name" oninput="this.dataset.modified='true'">
+                            </div>
                         </div>
-                        <div class="bg-purple-50 px-5 py-3 sm:px-6 sm:py-4 rounded-2xl border border-purple-200 text-left lg:text-right w-full lg:w-auto">
+                        <div class="bg-purple-50 px-5 py-3 sm:px-6 sm:py-4 rounded-2xl border border-purple-200 text-left lg:text-right w-full lg:w-auto shrink-0 mt-4 lg:mt-0">
                             <p class="text-[9px] sm:text-[10px] text-purple-600 uppercase font-black tracking-widest mb-1">Pipeline Status</p>
                             <p class="text-base sm:text-lg font-bold text-purple-700" id="soft-disp-status">Requirements Gathering</p>
                             <div class="mt-3 w-full lg:w-32 lg:ml-auto bg-purple-200/50 rounded-full h-1.5 overflow-hidden">
@@ -476,26 +480,32 @@
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 w-full">
                             <div class="w-full">
                                 <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase ml-1">Target Platform</span>
-                                <p class="font-bold text-slate-800 mt-1 sm:mt-2 bg-slate-50 p-2.5 sm:p-3 rounded-xl border border-slate-100 text-sm sm:text-base w-full" id="soft-disp-platform">---</p>
+                                <select id="soft-disp-platform" class="custom-input mt-1 sm:mt-2 font-bold text-slate-800 text-sm sm:text-base w-full" oninput="this.dataset.modified='true'">
+                                    <option value="Web Application">Web Application</option>
+                                    <option value="Mobile App (iOS/Android)">Mobile App (iOS/Android)</option>
+                                    <option value="Landing Page / Website">Landing Page / Website</option>
+                                    <option value="Desktop Software">Desktop Software</option>
+                                    <option value="API / Backend System">API / Backend System</option>
+                                </select>
                             </div>
                             <div class="w-full">
                                 <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase ml-1">Preferred Stack</span>
-                                <p class="font-mono text-xs sm:text-sm font-bold text-slate-800 mt-1 sm:mt-2 bg-slate-50 p-2.5 sm:p-3 rounded-xl border border-slate-100 w-full" id="soft-disp-stack">---</p>
+                                <input type="text" id="soft-disp-stack" class="custom-input font-mono text-xs sm:text-sm font-bold text-slate-800 mt-1 sm:mt-2 w-full" placeholder="e.g. Firebase, React..." oninput="this.dataset.modified='true'">
                             </div>
                             <div class="w-full">
                                 <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase ml-1">Deadline</span>
-                                <p class="font-bold text-red-600 mt-1 sm:mt-2 bg-red-50 p-2.5 sm:p-3 rounded-xl border border-red-100 inline-block text-sm sm:text-base w-full lg:w-auto" id="soft-disp-deadline">---</p>
+                                <input type="date" id="soft-disp-deadline" class="custom-input text-red-600 font-bold mt-1 sm:mt-2 w-full lg:w-auto" oninput="this.dataset.modified='true'">
                             </div>
                             <div class="w-full">
                                 <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase ml-1">Repository Link</span>
-                                <a href="#" target="_blank" id="soft-disp-repo" class="text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-800 mt-1 sm:mt-2 bg-blue-50 p-2.5 sm:p-3 rounded-xl border border-blue-100 block truncate transition-colors w-full">---</a>
+                                <input type="url" id="soft-disp-repo" class="custom-input text-xs sm:text-sm font-bold text-blue-600 mt-1 sm:mt-2 w-full" placeholder="e.g. https://github.com/..." oninput="this.dataset.modified='true'">
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 w-full">
                         <h3 class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-400 mb-4 sm:mb-6 border-b border-slate-100 pb-3">Core Requirements & Business Logic</h3>
-                        <div class="text-xs sm:text-sm font-medium text-slate-700 whitespace-pre-wrap leading-relaxed bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-100 w-full" id="soft-disp-requirements">---</div>
+                        <textarea id="soft-disp-requirements" class="custom-input text-xs sm:text-sm font-medium text-slate-700 leading-relaxed mt-1 sm:mt-2 h-40 resize-none w-full" placeholder="Describe the functionality needed..." oninput="this.dataset.modified='true'"></textarea>
                     </div>
 
                 </div>
@@ -597,7 +607,6 @@
                     this.hardwareDataPending.sort((a,b) => b.timestamp - a.timestamp);
                     if(this.currentMode === 'hardware') this.renderQueue();
 
-                    // Real-time UI Sync for open Workspace
                     if(this.currentMode === 'hardware' && this.currentDbKey) {
                         const updatedRecord = this.hardwareDataAll.find(r => r.key === this.currentDbKey);
                         if(updatedRecord) {
@@ -623,7 +632,6 @@
                     this.softwareDataPending.sort((a,b) => b.timestamp - a.timestamp);
                     if(this.currentMode === 'software') this.renderQueue();
 
-                    // Real-time UI Sync
                     if(this.currentMode === 'software' && this.currentDbKey) {
                         const updatedRecord = this.softwareDataAll.find(r => r.key === this.currentDbKey);
                         if(updatedRecord) {
@@ -851,7 +859,6 @@
 
                 try {
                     if(this.currentMode === 'hardware') {
-                        // Clear all "modified" tracking flags when loading a new file so it fetches fresh data
                         document.querySelectorAll('#hardware-workspace [data-modified="true"]').forEach(el => delete el.dataset.modified);
                         this.populateHardwareWorkspace();
                     } else {
@@ -1001,7 +1008,6 @@
             toggleCheck(id) {
                 const el = document.getElementById(id);
                 if (!el) return;
-                // Treat toggle as modification
                 el.dataset.modified = "true";
                 if(el.classList.contains('fa-square-check')) {
                     el.className = "fa-regular fa-square text-slate-300 text-lg sm:text-xl transition-colors";
@@ -1040,14 +1046,12 @@
                 block.style.backgroundColor = colorMap[val] || val;
             }
 
-            // Ensures that active inputs are NOT overwritten by live Sync if the technician modified them
             populateHardwareDisplayOnly() {
                 const rec = this.currentRecord;
                 
                 const safeSetText = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
                 const safeSetValue = (id, val) => { 
                     const el = document.getElementById(id); 
-                    // ONLY update if user hasn't explicitly modified it or focused it
                     if(el && !el.dataset.modified && document.activeElement !== el) el.value = val; 
                 };
 
@@ -1131,36 +1135,27 @@
             populateSoftwareDisplayOnly() {
                 const rec = this.currentRecord;
                 const safeSetText = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
+                const safeSetValue = (id, val) => { 
+                    const el = document.getElementById(id); 
+                    if(el && !el.dataset.modified && document.activeElement !== el) el.value = val; 
+                };
 
                 safeSetText('soft-disp-ref', `SFT-${rec.refId}`);
-                safeSetText('soft-disp-project', rec.projectName || 'Unnamed Project');
-                safeSetText('soft-disp-client', rec.clientName || 'Unknown Client');
                 safeSetText('soft-disp-status', rec.status || 'Requirements Gathering');
-                safeSetText('soft-disp-platform', rec.platform || 'Not specified');
-                safeSetText('soft-disp-stack', rec.techStack || 'TBD');
-                safeSetText('soft-disp-deadline', rec.deadline || 'No specific date');
-                safeSetText('soft-disp-requirements', rec.requirements || 'No specific requirements described.');
+                
+                safeSetValue('soft-disp-project', rec.projectName || '');
+                safeSetValue('soft-disp-client', rec.clientName || '');
+                safeSetValue('soft-disp-platform', rec.platform || 'Web Application');
+                safeSetValue('soft-disp-stack', rec.techStack || '');
+                safeSetValue('soft-disp-deadline', rec.deadline || '');
+                safeSetValue('soft-disp-repo', rec.repoLink || '');
+                safeSetValue('soft-disp-requirements', rec.requirements || '');
 
                 const prog = this.getProgressConfig('software', rec.status || 'Requirements Gathering');
                 const pb = document.getElementById('sw-progress-bar');
                 if (pb) {
                     pb.style.width = `${prog.percent}%`;
                     pb.className = `${prog.color} h-1.5 rounded-full transition-all duration-500`;
-                }
-
-                const repoEl = document.getElementById('soft-disp-repo');
-                if (repoEl) {
-                    if (rec.repoLink) {
-                        repoEl.href = rec.repoLink;
-                        repoEl.innerText = rec.repoLink;
-                        repoEl.classList.remove('text-slate-400', 'pointer-events-none');
-                        repoEl.classList.add('text-blue-600');
-                    } else {
-                        repoEl.removeAttribute('href');
-                        repoEl.innerText = "No repository attached";
-                        repoEl.classList.add('text-slate-400', 'pointer-events-none');
-                        repoEl.classList.remove('text-blue-600');
-                    }
                 }
             }
 
@@ -1265,7 +1260,7 @@
 
             getPartData(partId, fields) {
                 const cb = document.getElementById(`part-${partId}`);
-                if (!cb || !cb.checked) return null; // CRITICAL: returning null removes false nodes from DB cleanly
+                if (!cb || !cb.checked) return null; 
 
                 let data = { needed: true };
                 fields.forEach(f => {
@@ -1325,7 +1320,6 @@
                     specs: getVal('disp-charger-specs')
                 };
 
-                // Procurement accurately structures exact values requested or correctly nullifies when unchecked
                 const partsRequired = {
                     screen: this.getPartData('screen', ['specs', 'pn']),
                     mobo: this.getPartData('mobo', ['pn']),
@@ -1392,7 +1386,6 @@
                     this.hideLoading();
                     this.showToast("Signed & Saved Successfully!");
 
-                    // Ensure tracking flags are completely cleaned so future edits are tracked newly
                     document.querySelectorAll('#hardware-workspace [data-modified="true"]').forEach(el => delete el.dataset.modified);
 
                     const utn = document.getElementById('update-tech-name');
@@ -1426,6 +1419,13 @@
 
                 try {
                     let updatePayload = {
+                        projectName: getVal('soft-disp-project'),
+                        clientName: getVal('soft-disp-client'),
+                        platform: getVal('soft-disp-platform'),
+                        techStack: getVal('soft-disp-stack'),
+                        deadline: getVal('soft-disp-deadline'),
+                        repoLink: getVal('soft-disp-repo'),
+                        requirements: getVal('soft-disp-requirements'),
                         devAssigned: devAssigned,
                         status: status,
                         devNotes: devNotes,
