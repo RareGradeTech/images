@@ -279,6 +279,7 @@
                         </div>
                     </div>
 
+                    <!-- REALTIME IMAGES RENDER HERE -->
                     <div id="existing-photos-container" class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 hidden space-y-8">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                             <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Captured Evidence</h3>
@@ -607,11 +608,13 @@
                     this.hardwareDataPending.sort((a,b) => b.timestamp - a.timestamp);
                     if(this.currentMode === 'hardware') this.renderQueue();
 
+                    // Real-time UI Sync for open Workspace
                     if(this.currentMode === 'hardware' && this.currentDbKey) {
                         const updatedRecord = this.hardwareDataAll.find(r => r.key === this.currentDbKey);
                         if(updatedRecord) {
                             this.currentRecord = updatedRecord;
                             this.populateHardwareDisplayOnly(); 
+                            this.renderGalleries(updatedRecord); // LIVE SYNC IMAGES
                         }
                     }
 
@@ -708,6 +711,22 @@
                 this.renderQueue();
             }
 
+            getDeviceImage(deviceName) {
+                const name = (deviceName || '').toLowerCase();
+                if (name.includes('mac') || name.includes('apple')) return 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80';
+                if (name.includes('hp') || name.includes('hewlett')) return 'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=500&q=80';
+                if (name.includes('lenovo') || name.includes('ideapad') || name.includes('thinkpad')) return 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500&q=80';
+                if (name.includes('dell') || name.includes('inspiron') || name.includes('xps') || name.includes('latitude')) return 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=500&q=80';
+                if (name.includes('mecer') || name.includes('mercer')) return 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=500&q=80';
+                if (name.includes('asus') || name.includes('rog') || name.includes('acer') || name.includes('nitro') || name.includes('gaming')) return 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=500&q=80';
+                if (name.includes('laptop') || name.includes('notebook')) return 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80';
+                if (name.includes('iphone') || name.includes('samsung') || name.includes('phone') || name.includes('galaxy') || name.includes('mobile')) return 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80';
+                if (name.includes('ipad') || name.includes('tablet') || name.includes('tab')) return 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&q=80';
+                if (name.includes('pc') || name.includes('desktop') || name.includes('computer')) return 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=500&q=80';
+                
+                return 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&q=80';
+            }
+
             renderQueue() {
                 const grid = document.getElementById('queue-grid');
                 if (!grid) return;
@@ -736,12 +755,17 @@
                     };
 
                     if (this.currentMode === 'hardware') {
+                        const mockImg = this.getDeviceImage(rec.device);
                         card.innerHTML = `
-                            <div class="p-7 flex flex-col flex-1">
-                                <div class="flex justify-between items-start mb-5">
-                                    <span class="font-mono text-[11px] font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 tracking-widest shadow-sm">RGT-${rec.refId}</span>
-                                    <span class="text-[9px] font-black uppercase tracking-widest text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100 shadow-sm">${rec.status}</span>
+                            <div class="h-32 relative">
+                                <img src="${mockImg}" class="w-full h-full object-cover" />
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+                                <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+                                    <span class="font-mono text-xs font-bold text-white bg-blue-600/90 backdrop-blur px-2 py-1 rounded shadow border border-blue-400/30">RGT-${rec.refId}</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/90 backdrop-blur px-2 py-1 rounded-full shadow">${rec.status}</span>
                                 </div>
+                            </div>
+                            <div class="p-7 flex flex-col flex-1">
                                 <h4 class="font-black text-slate-800 text-lg mb-2 truncate leading-tight">${rec.device || 'Unknown Device'}</h4>
                                 <p class="text-sm font-medium text-slate-500 truncate"><i class="fa-solid fa-user mr-2 text-slate-400"></i>${rec.clientName}</p>
                                 <div class="mt-auto pt-6 flex justify-between items-center border-t border-slate-50 mt-6">
@@ -918,10 +942,10 @@
                 const cb = document.getElementById(`part-${partId}`);
                 if (!cb) return;
 
-                const isNeeded = typeof data === 'object' ? data?.needed : !!data;
+                const isNeeded = (data && typeof data === 'object') ? data.needed : !!data;
                 cb.checked = isNeeded;
                 
-                if(typeof data === 'object') {
+                if(data && typeof data === 'object') {
                     fields.forEach(f => {
                         const input = document.getElementById(`part-${partId}-${f}`);
                         if(input) {
@@ -961,6 +985,18 @@
                     container.classList.add('hidden');
                     gallery.innerHTML = '';
                     return false;
+                }
+            }
+
+            renderGalleries(rec) {
+                const hasBefore = this.renderExistingGallery('before', rec.photosBefore);
+                const hasAfter = this.renderExistingGallery('after', rec.photosAfter);
+                const hasLegacy = this.renderExistingGallery('legacy', rec.photos); 
+
+                const epc = document.getElementById('existing-photos-container');
+                if (epc) {
+                    if (hasBefore || hasAfter || hasLegacy) epc.classList.remove('hidden');
+                    else epc.classList.add('hidden');
                 }
             }
             
@@ -1050,16 +1086,7 @@
             populateHardwareWorkspace() {
                 const rec = this.currentRecord;
                 this.populateHardwareDisplayOnly();
-
-                const hasBefore = this.renderExistingGallery('before', rec.photosBefore);
-                const hasAfter = this.renderExistingGallery('after', rec.photosAfter);
-                const hasLegacy = this.renderExistingGallery('legacy', rec.photos); 
-
-                const epc = document.getElementById('existing-photos-container');
-                if (epc) {
-                    if (hasBefore || hasAfter || hasLegacy) epc.classList.remove('hidden');
-                    else epc.classList.add('hidden');
-                }
+                this.renderGalleries(rec); 
 
                 const safeSetValue = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
                 
@@ -1159,18 +1186,34 @@
                 this.showLoading("Verifying Signature...");
 
                 try {
-                    const snap = await this.db.ref('employees').orderByChild('employeeNumber').equalTo(pin).once('value');
+                    // BULLETPROOF FETCH: Avoids Firebase Indexing & Type Mismatch Errors
+                    const snap = await this.db.ref('employees').once('value');
                     
                     if (!snap.exists()) {
+                        this.hideLoading();
+                        this.showToast("No employees registered", "error");
+                        return;
+                    }
+
+                    let empKey = null;
+                    let empData = null;
+
+                    // Loop through to find exact PIN match regardless of string/number type
+                    snap.forEach(child => {
+                        const data = child.val();
+                        if (String(data.employeeNumber) === String(pin)) {
+                            empKey = child.key;
+                            empData = data;
+                        }
+                    });
+
+                    if (!empKey) {
                         this.hideLoading();
                         this.showToast("Invalid Employee PIN", "error");
                         return;
                     }
-
-                    const empKey = Object.keys(snap.val())[0];
-                    const empData = snap.val()[empKey];
                     
-                    // CRITICAL FIX: Capture mode BEFORE calling cancelSignoff
+                    // Capture mode BEFORE calling cancelSignoff
                     const currentMode = this.pendingSignoffMode;
                     
                     this.cancelSignoff();
