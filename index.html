@@ -656,8 +656,24 @@
 
             getDeviceImage(deviceName) {
                 const name = (deviceName || '').toLowerCase();
-                if (name.includes('macbook') || name.includes('laptop') || name.includes('ideapad') || name.includes('thinkpad') || name.includes('hp') || name.includes('dell')) {
-                    return 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80'; // Sleek laptop
+                
+                // Specific Brands
+                if (name.includes('mac') || name.includes('apple')) {
+                    return 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80'; // MacBook
+                } else if (name.includes('hp') || name.includes('hewlett')) {
+                    return 'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=500&q=80'; // HP style
+                } else if (name.includes('lenovo') || name.includes('ideapad') || name.includes('thinkpad')) {
+                    return 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500&q=80'; // Lenovo style (dark/business)
+                } else if (name.includes('dell') || name.includes('inspiron') || name.includes('xps') || name.includes('latitude')) {
+                    return 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=500&q=80'; // Dell style
+                } else if (name.includes('mecer') || name.includes('mercer')) {
+                    return 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=500&q=80'; // Mecer style (standard/generic black)
+                } else if (name.includes('asus') || name.includes('rog') || name.includes('acer') || name.includes('nitro') || name.includes('gaming')) {
+                    return 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=500&q=80'; // Gaming laptop with RGB
+                } 
+                // Form Factors
+                else if (name.includes('laptop') || name.includes('notebook')) {
+                    return 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80'; // Generic Laptop
                 } else if (name.includes('iphone') || name.includes('samsung') || name.includes('phone') || name.includes('galaxy') || name.includes('mobile')) {
                     return 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80'; // Phone
                 } else if (name.includes('ipad') || name.includes('tablet') || name.includes('tab')) {
@@ -665,6 +681,7 @@
                 } else if (name.includes('pc') || name.includes('desktop') || name.includes('computer')) {
                     return 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=500&q=80'; // Desktop PC
                 }
+                
                 return 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&q=80'; // Generic tech/circuit board
             }
 
