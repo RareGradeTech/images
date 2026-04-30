@@ -250,6 +250,9 @@
                         <div class="bg-amber-50 px-5 py-3 sm:px-6 sm:py-4 rounded-2xl border border-amber-200 text-left lg:text-right w-full lg:w-auto">
                             <p class="text-[9px] sm:text-[10px] text-amber-600 uppercase font-black tracking-widest mb-1">Current Status</p>
                             <p class="text-base sm:text-lg font-bold text-amber-700" id="disp-status">Pending</p>
+                            <div class="mt-3 w-full lg:w-32 lg:ml-auto bg-amber-200/50 rounded-full h-1.5 overflow-hidden">
+                                <div id="hw-progress-bar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-500" style="width: 10%"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -498,6 +501,9 @@
                         <div class="bg-purple-50 px-5 py-3 sm:px-6 sm:py-4 rounded-2xl border border-purple-200 text-left lg:text-right w-full lg:w-auto">
                             <p class="text-[9px] sm:text-[10px] text-purple-600 uppercase font-black tracking-widest mb-1">Pipeline Status</p>
                             <p class="text-base sm:text-lg font-bold text-purple-700" id="soft-disp-status">Requirements Gathering</p>
+                            <div class="mt-3 w-full lg:w-32 lg:ml-auto bg-purple-200/50 rounded-full h-1.5 overflow-hidden">
+                                <div id="sw-progress-bar" class="bg-purple-500 h-1.5 rounded-full transition-all duration-500" style="width: 10%"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -730,6 +736,30 @@
                 this.renderQueue();
             }
 
+            getProgressConfig(mode, status) {
+                if (mode === 'hardware') {
+                    switch(status) {
+                        case 'Pending': return { percent: 10, color: 'bg-amber-500' };
+                        case 'In Repair': return { percent: 40, color: 'bg-blue-500' };
+                        case 'Waiting for Parts': return { percent: 40, color: 'bg-orange-500' };
+                        case 'Ready for Collection': return { percent: 80, color: 'bg-emerald-500' };
+                        case 'Completed & Collected': return { percent: 100, color: 'bg-slate-500' };
+                        case 'Failed to Repair': return { percent: 100, color: 'bg-red-500' };
+                        default: return { percent: 10, color: 'bg-amber-500' };
+                    }
+                } else {
+                    switch(status) {
+                        case 'Requirements Gathering': return { percent: 10, color: 'bg-slate-500' };
+                        case 'UI/UX Design': return { percent: 30, color: 'bg-purple-500' };
+                        case 'In Development': return { percent: 60, color: 'bg-blue-500' };
+                        case 'Testing & QA': return { percent: 80, color: 'bg-amber-500' };
+                        case 'Deployed / Completed': return { percent: 100, color: 'bg-emerald-500' };
+                        case 'Pending': return { percent: 10, color: 'bg-amber-500' };
+                        default: return { percent: 10, color: 'bg-slate-500' };
+                    }
+                }
+            }
+
             renderQueue() {
                 const grid = document.getElementById('queue-grid');
                 if (!grid) return;
@@ -758,6 +788,7 @@
                     };
 
                     if (this.currentMode === 'hardware') {
+                        const prog = this.getProgressConfig('hardware', rec.status || 'Pending');
                         card.innerHTML = `
                             <div class="p-6 sm:p-7 flex flex-col flex-1 relative overflow-hidden group">
                                 <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -767,6 +798,9 @@
                                 </div>
                                 <h4 class="font-black text-slate-800 text-base sm:text-lg mb-2 truncate leading-tight relative z-10">${rec.device || 'Unknown Device'}</h4>
                                 <p class="text-xs sm:text-sm font-medium text-slate-500 truncate relative z-10"><i class="fa-solid fa-user mr-2 text-slate-400"></i>${rec.clientName}</p>
+                                <div class="mt-3 w-full bg-slate-100 rounded-full h-1.5 mb-1 overflow-hidden relative z-10">
+                                    <div class="${prog.color} h-1.5 rounded-full transition-all duration-500" style="width: ${prog.percent}%"></div>
+                                </div>
                                 <div class="mt-auto pt-5 sm:pt-6 flex justify-between items-center border-t border-slate-50 mt-5 sm:mt-6 relative z-10">
                                     <span class="text-slate-400 font-bold text-[10px] sm:text-xs"><i class="fa-regular fa-clock mr-1"></i> ${this.timeAgo(rec.timestamp)}</span>
                                     <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 group-hover:shadow-lg group-hover:shadow-blue-500/30 group-hover:scale-110">
@@ -776,6 +810,7 @@
                             </div>
                         `;
                     } else {
+                        const prog = this.getProgressConfig('software', rec.status || 'Requirements Gathering');
                         card.innerHTML = `
                             <div class="p-6 sm:p-7 flex flex-col flex-1 relative overflow-hidden group">
                                 <div class="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -785,6 +820,9 @@
                                 </div>
                                 <h4 class="font-black text-slate-800 text-base sm:text-lg mb-2 truncate leading-tight relative z-10">${rec.projectName || 'Unnamed Project'}</h4>
                                 <p class="text-xs sm:text-sm font-medium text-slate-500 truncate relative z-10"><i class="fa-solid fa-building mr-2 text-slate-400"></i>${rec.clientName}</p>
+                                <div class="mt-3 w-full bg-slate-100 rounded-full h-1.5 mb-1 overflow-hidden relative z-10">
+                                    <div class="${prog.color} h-1.5 rounded-full transition-all duration-500" style="width: ${prog.percent}%"></div>
+                                </div>
                                 <div class="mt-auto pt-5 sm:pt-6 flex justify-between items-center border-t border-slate-50 mt-5 sm:mt-6 relative z-10">
                                     <span class="text-slate-500 font-bold text-[9px] sm:text-[10px] uppercase tracking-wider bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">${rec.platform}</span>
                                     <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-50 flex items-center justify-center text-purple-500 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 group-hover:shadow-lg group-hover:shadow-purple-500/30 group-hover:scale-110">
@@ -1052,6 +1090,13 @@
                 safeSetValue('disp-issue', rec.issue || '');
                 safeSetText('disp-status', rec.status || 'Pending');
 
+                const prog = this.getProgressConfig('hardware', rec.status || 'Pending');
+                const pb = document.getElementById('hw-progress-bar');
+                if (pb) {
+                    pb.style.width = `${prog.percent}%`;
+                    pb.className = `${prog.color} h-1.5 rounded-full transition-all duration-500`;
+                }
+
                 safeSetValue('disp-color', rec.color || '');
                 this.updateColorPreview();
 
@@ -1125,6 +1170,13 @@
                 safeSetText('soft-disp-stack', rec.techStack || 'TBD');
                 safeSetText('soft-disp-deadline', rec.deadline || 'No specific date');
                 safeSetText('soft-disp-requirements', rec.requirements || 'No specific requirements described.');
+
+                const prog = this.getProgressConfig('software', rec.status || 'Requirements Gathering');
+                const pb = document.getElementById('sw-progress-bar');
+                if (pb) {
+                    pb.style.width = `${prog.percent}%`;
+                    pb.className = `${prog.color} h-1.5 rounded-full transition-all duration-500`;
+                }
 
                 const repoEl = document.getElementById('soft-disp-repo');
                 if (repoEl) {
