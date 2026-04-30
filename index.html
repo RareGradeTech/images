@@ -579,6 +579,7 @@
                 
                 this.currentDbKey = null;
                 this.currentRecord = null; 
+                this.sessionRestored = false;
                 
                 this.selectedFilesBefore = [];
                 this.selectedFilesAfter = [];
@@ -594,7 +595,7 @@
             }
 
             // ==========================================
-            // REAL-TIME DATA SYNC
+            // REAL-TIME DATA SYNC & PERSISTENCE
             // ==========================================
             listenForData() {
                 this.db.ref('reports').on('value', snap => {
@@ -617,6 +618,8 @@
                             this.populateHardwareDisplayOnly(); 
                         }
                     }
+
+                    this.checkSessionState();
                 });
 
                 this.db.ref('software_projects').on('value', snap => {
@@ -641,7 +644,26 @@
                             this.populateSoftwareDisplayOnly(); 
                         }
                     }
+
+                    this.checkSessionState();
                 });
+            }
+
+            checkSessionState() {
+                if (this.sessionRestored) return; 
+                const saved = sessionStorage.getItem('activeRecord');
+                if (saved) {
+                    try {
+                        const { mode, id } = JSON.parse(saved);
+                        const dataPool = mode === 'hardware' ? this.hardwareDataAll : this.softwareDataAll;
+                        if (dataPool.length > 0) {
+                            this.sessionRestored = true;
+                            this.setMode(mode);
+                            document.getElementById('search-ref-id').value = id;
+                            this.fetchRecord();
+                        }
+                    } catch(e) {}
+                }
             }
 
             setMode(mode) {
@@ -795,6 +817,10 @@
                     } else {
                         this.populateSoftwareWorkspace();
                     }
+                    
+                    // Persist state
+                    sessionStorage.setItem('activeRecord', JSON.stringify({ mode: this.currentMode, id: rawRef }));
+                    
                     this.hideLoading();
                     this.openWorkspace();
                 } catch (err) {
@@ -823,6 +849,7 @@
                 this.currentDbKey = null;
                 this.selectedFilesBefore = [];
                 this.selectedFilesAfter = [];
+                sessionStorage.removeItem('activeRecord');
                 
                 document.getElementById('preview-grid-before').innerHTML = '';
                 document.getElementById('preview-grid-after').innerHTML = '';
@@ -1216,7 +1243,12 @@
 
                     this.hideLoading();
                     this.showToast("Hardware Record updated!");
-                    setTimeout(() => this.resetToSearch(), 1500);
+
+                    // Ensure local array is updated so the preview resets
+                    this.selectedFilesBefore = [];
+                    this.selectedFilesAfter = [];
+                    document.getElementById('preview-grid-before').innerHTML = '';
+                    document.getElementById('preview-grid-after').innerHTML = '';
 
                 } catch (error) {
                     this.hideLoading();
@@ -1245,7 +1277,6 @@
 
                     this.hideLoading();
                     this.showToast("Software Pipeline updated!");
-                    setTimeout(() => this.resetToSearch(), 1500);
 
                 } catch (error) {
                     this.hideLoading();
