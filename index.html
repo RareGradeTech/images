@@ -206,7 +206,16 @@
                                     <span class="text-[10px] font-bold text-slate-500 uppercase">Color:</span>
                                     <input type="text" id="disp-color" class="custom-input py-1 px-2 text-xs bg-white border-slate-300">
                                 </div>
-                                <p class="text-xs text-slate-500 mt-2"><i class="fa-solid fa-plug mr-1"></i> Charger Logged: <span id="disp-charger" class="font-medium text-amber-600">---</span></p>
+                                
+                                <!-- TECH CHARGER EDIT -->
+                                <div class="mt-4 flex items-center gap-3">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" id="disp-chk-charger" class="w-4 h-4 text-blue-600 rounded" onchange="techApp.toggleTechCharger()">
+                                        <span class="text-xs font-bold text-slate-700 uppercase">Charger Included?</span>
+                                    </label>
+                                    <input type="text" id="disp-charger-specs" class="custom-input py-1 px-2 text-xs flex-1 hidden border-blue-200" placeholder="Specs (e.g. 65W)">
+                                </div>
+
                             </div>
                             <div>
                                 <span class="text-[10px] font-bold text-slate-500 uppercase">Reported Issue</span>
@@ -645,6 +654,20 @@
                 this.renderQueue();
             }
 
+            getDeviceImage(deviceName) {
+                const name = (deviceName || '').toLowerCase();
+                if (name.includes('macbook') || name.includes('laptop') || name.includes('ideapad') || name.includes('thinkpad') || name.includes('hp') || name.includes('dell')) {
+                    return 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80'; // Sleek laptop
+                } else if (name.includes('iphone') || name.includes('samsung') || name.includes('phone') || name.includes('galaxy') || name.includes('mobile')) {
+                    return 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80'; // Phone
+                } else if (name.includes('ipad') || name.includes('tablet') || name.includes('tab')) {
+                    return 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&q=80'; // Tablet
+                } else if (name.includes('pc') || name.includes('desktop') || name.includes('computer')) {
+                    return 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=500&q=80'; // Desktop PC
+                }
+                return 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&q=80'; // Generic tech/circuit board
+            }
+
             renderQueue() {
                 const grid = document.getElementById('queue-grid');
                 grid.innerHTML = '';
@@ -660,7 +683,7 @@
 
                 dataArray.forEach((rec, index) => {
                     const card = document.createElement('div');
-                    card.className = "card-hover bg-white rounded-xl border border-slate-200 p-5 cursor-pointer flex flex-col h-full opacity-0 animate-fade-in-up";
+                    card.className = "card-hover bg-white rounded-xl border border-slate-200 overflow-hidden cursor-pointer flex flex-col h-full opacity-0 animate-fade-in-up";
                     card.style.animationDelay = `${index * 50}ms`;
                     
                     card.onclick = () => {
@@ -669,29 +692,38 @@
                     };
 
                     if (this.currentMode === 'hardware') {
+                        const mockImg = this.getDeviceImage(rec.device);
                         card.innerHTML = `
-                            <div class="flex justify-between items-start mb-3">
-                                <span class="font-mono text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-100">RGT-${rec.refId}</span>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-1 rounded-full">${rec.status}</span>
+                            <div class="h-32 relative">
+                                <img src="${mockImg}" class="w-full h-full object-cover" />
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+                                <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+                                    <span class="font-mono text-xs font-bold text-white bg-blue-600/90 backdrop-blur px-2 py-1 rounded shadow border border-blue-400/30">RGT-${rec.refId}</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/90 backdrop-blur px-2 py-1 rounded-full shadow">${rec.status}</span>
+                                </div>
                             </div>
-                            <h4 class="font-bold text-slate-800 text-sm truncate">${rec.device || 'Unknown Device'}</h4>
-                            <p class="text-xs text-slate-500 mt-1 truncate"><i class="fa-solid fa-user mr-1 text-slate-400"></i> ${rec.clientName}</p>
-                            <div class="mt-auto pt-4 flex justify-between items-center text-xs border-t border-slate-50 mt-4">
-                                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> ${this.timeAgo(rec.timestamp)}</span>
-                                <i class="fa-solid fa-arrow-right text-blue-300"></i>
+                            <div class="p-5 flex flex-col flex-1">
+                                <h4 class="font-bold text-slate-800 text-sm truncate">${rec.device || 'Unknown Device'}</h4>
+                                <p class="text-xs text-slate-500 mt-1 truncate"><i class="fa-solid fa-user mr-1 text-slate-400"></i> ${rec.clientName}</p>
+                                <div class="mt-auto pt-4 flex justify-between items-center text-xs border-t border-slate-50 mt-4">
+                                    <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> ${this.timeAgo(rec.timestamp)}</span>
+                                    <i class="fa-solid fa-arrow-right text-blue-300"></i>
+                                </div>
                             </div>
                         `;
                     } else {
                         card.innerHTML = `
-                            <div class="flex justify-between items-start mb-3">
-                                <span class="font-mono text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded border border-purple-100">SFT-${rec.refId}</span>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Pending</span>
-                            </div>
-                            <h4 class="font-bold text-slate-800 text-sm truncate">${rec.projectName || 'Unnamed Project'}</h4>
-                            <p class="text-xs text-slate-500 mt-1 truncate"><i class="fa-solid fa-building mr-1 text-slate-400"></i> ${rec.clientName}</p>
-                            <div class="mt-auto pt-4 flex justify-between items-center text-xs border-t border-slate-50 mt-4">
-                                <span class="text-slate-400 font-medium bg-slate-100 px-2 py-1 rounded">${rec.platform}</span>
-                                <i class="fa-solid fa-laptop-code text-purple-300"></i>
+                            <div class="p-5 flex flex-col flex-1">
+                                <div class="flex justify-between items-start mb-3">
+                                    <span class="font-mono text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded border border-purple-100">SFT-${rec.refId}</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Pending</span>
+                                </div>
+                                <h4 class="font-bold text-slate-800 text-sm truncate">${rec.projectName || 'Unnamed Project'}</h4>
+                                <p class="text-xs text-slate-500 mt-1 truncate"><i class="fa-solid fa-building mr-1 text-slate-400"></i> ${rec.clientName}</p>
+                                <div class="mt-auto pt-4 flex justify-between items-center text-xs border-t border-slate-50 mt-4">
+                                    <span class="text-slate-400 font-medium bg-slate-100 px-2 py-1 rounded">${rec.platform}</span>
+                                    <i class="fa-solid fa-laptop-code text-purple-300"></i>
+                                </div>
                             </div>
                         `;
                     }
@@ -868,6 +900,17 @@
                 }
             }
 
+            toggleTechCharger() {
+                const chk = document.getElementById('disp-chk-charger').checked;
+                const specInput = document.getElementById('disp-charger-specs');
+                if (chk) {
+                    specInput.classList.remove('hidden');
+                } else {
+                    specInput.classList.add('hidden');
+                    specInput.value = '';
+                }
+            }
+
             populateHardwareDisplayOnly() {
                 const rec = this.currentRecord;
                 document.getElementById('disp-ref').innerText = `RGT-${rec.refId}`;
@@ -879,17 +922,16 @@
                 document.getElementById('disp-issue').value = rec.issue || '';
                 document.getElementById('disp-status').innerText = rec.status || 'Pending';
 
-                // Charger UI update
-                let chargerTxt = 'None left by client';
-                const charDisp = document.getElementById('disp-charger');
-                if (rec.charger && rec.charger.included) {
-                    chargerTxt = 'Included';
-                    if (rec.charger.specs) chargerTxt += ` (${rec.charger.specs})`;
-                    charDisp.classList.replace('text-slate-500', 'text-amber-600');
-                } else {
-                    charDisp.classList.replace('text-amber-600', 'text-slate-500');
+                // Charger UI update - Tech Edit Sync
+                const chargerChk = document.getElementById('disp-chk-charger');
+                const chargerSpecs = document.getElementById('disp-charger-specs');
+                
+                if (rec.charger) {
+                    chargerChk.checked = rec.charger.included || false;
+                    chargerSpecs.value = rec.charger.specs || '';
+                    if(chargerChk.checked) chargerSpecs.classList.remove('hidden');
+                    else chargerSpecs.classList.add('hidden');
                 }
-                charDisp.innerText = chargerTxt;
 
                 const setIcon = (id, condition) => {
                     const el = document.getElementById(id);
@@ -1056,6 +1098,11 @@
                     cracks: getCheck('disp-chk-cracks'),
                     dataWaiver: getCheck('disp-chk-data')
                 };
+                
+                const charger = {
+                    included: document.getElementById('disp-chk-charger').checked,
+                    specs: document.getElementById('disp-charger-specs').value
+                };
 
                 // Scrape Detailed Procurement Fields
                 const partsRequired = {
@@ -1105,6 +1152,7 @@
                         color: updatedColor,
                         issue: updatedIssue,
                         checks: checks,
+                        charger: charger,
                         techName: techName,
                         status: status,
                         estimatedCompletionDate: etaDate,
