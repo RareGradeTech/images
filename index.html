@@ -99,6 +99,50 @@
         .signoff-box { transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
         #signoff-modal.active .signoff-box { transform: scale(1); }
 
+        /* Image lightbox */
+        #lightbox {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px);
+            z-index: 999999; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        #lightbox.active { opacity: 1; pointer-events: all; }
+        #lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 12px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+
+        /* Visit Log Cards */
+        .visit-log-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .visit-log-card:hover { border-color: #10b981; background: #f0fdf4; }
+        .visit-log-card .log-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 10px; padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .visit-log-card .log-badge {
+            background: #ecfdf5; color: #065f46; font-size: 9px; font-weight: 800;
+            letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px;
+            border-radius: 20px; border: 1px solid #d1fae5;
+        }
+        .visit-log-card .log-field { display: flex; flex-direction: column; margin-bottom: 6px; }
+        .visit-log-card .log-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 2px; }
+        .visit-log-card .log-value { color: #334155; font-weight: 500; line-height: 1.4; }
+        .visit-log-card .checklist-item { display: flex; align-items: center; gap: 6px; padding: 3px 0; color: #475569; }
+        .visit-log-card .sig-link { color: #2563eb; text-decoration: underline; font-size: 10px; font-weight: 600; cursor: pointer; }
+
+        /* Support photo gallery */
+        .sup-gallery-img {
+            width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px;
+            border: 2px solid #d1fae5; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .sup-gallery-img:hover { transform: scale(1.04); box-shadow: 0 8px 20px rgba(16,185,129,0.2); border-color: #10b981; }
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
@@ -114,6 +158,12 @@
     <div id="toast">
         <i class="fa-solid fa-circle-check text-lg" id="toast-icon"></i>
         <span id="toast-msg">Success!</span>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/70 hover:text-white text-3xl transition-colors z-10"><i class="fa-solid fa-xmark"></i></button>
+        <img id="lightbox-img" src="" alt="Evidence">
     </div>
 
     <div id="signoff-modal">
@@ -148,6 +198,7 @@
 
     <div class="flex-1 overflow-hidden relative w-full">
 
+        <!-- SEARCH VIEW -->
         <div id="search-view" class="workspace-transition absolute inset-0 flex flex-col md:flex-row bg-slate-800/10 backdrop-blur-[2px] z-20 overflow-hidden">
             <div class="p-4 sm:p-6 md:p-8 h-full w-full md:w-1/3 md:min-w-[400px] lg:max-w-lg shrink-0 z-30 flex flex-col justify-center">
                 <div class="bg-white/95 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 md:p-10 flex flex-col shadow-[0_24px_60px_-15px_rgba(0,0,0,0.15)] border border-white/60 animate-slide-in-left relative h-auto max-h-[850px]">
@@ -196,7 +247,6 @@
                     </div>
                     
                     <div id="queue-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 pb-20 w-full">
-                        <!-- Cards injected here -->
                     </div>
                 </div>
             </div>
@@ -322,7 +372,6 @@
                                     <input type="text" id="part-screen-pn" class="custom-input py-2 text-[10px] sm:text-xs bg-white rounded-lg w-full" placeholder="Specific Part Number (Optional)">
                                 </div>
                             </div>
-
                             <div class="w-full">
                                 <label class="flex items-center gap-2 sm:gap-3 cursor-pointer hover:text-blue-600 transition-colors bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm w-full">
                                     <input type="checkbox" id="part-mobo" class="custom-checkbox shrink-0" onchange="techApp.togglePartDetails('mobo')"> Motherboard
@@ -331,7 +380,6 @@
                                     <input type="text" id="part-mobo-pn" class="custom-input py-2 text-[10px] sm:text-xs bg-white rounded-lg w-full" placeholder="Motherboard Rev / Part Number">
                                 </div>
                             </div>
-
                             <div class="w-full">
                                 <label class="flex items-center gap-2 sm:gap-3 cursor-pointer hover:text-blue-600 transition-colors bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm w-full">
                                     <input type="checkbox" id="part-battery" class="custom-checkbox shrink-0" onchange="techApp.togglePartDetails('battery')"> Battery
@@ -340,7 +388,6 @@
                                     <input type="text" id="part-battery-model" class="custom-input py-2 text-[10px] sm:text-xs bg-white rounded-lg w-full" placeholder="Battery Model / P/N">
                                 </div>
                             </div>
-
                             <div class="w-full">
                                 <label class="flex items-center gap-2 sm:gap-3 cursor-pointer hover:text-blue-600 transition-colors bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm w-full">
                                     <input type="checkbox" id="part-ram" class="custom-checkbox shrink-0" onchange="techApp.togglePartDetails('ram')"> RAM Upgrade
@@ -352,7 +399,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="w-full">
                                 <label class="flex items-center gap-2 sm:gap-3 cursor-pointer hover:text-blue-600 transition-colors bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm w-full">
                                     <input type="checkbox" id="part-ssd" class="custom-checkbox shrink-0" onchange="techApp.togglePartDetails('ssd')"> SSD / Storage
@@ -364,7 +410,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="w-full">
                                 <label class="flex items-center gap-2 sm:gap-3 cursor-pointer hover:text-blue-600 transition-colors bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm w-full">
                                     <input type="checkbox" id="part-fan" class="custom-checkbox shrink-0" onchange="techApp.togglePartDetails('fan')"> Cooling Fan
@@ -373,7 +418,6 @@
                                     <input type="text" id="part-fan-pn" class="custom-input py-2 text-[10px] sm:text-xs bg-white rounded-lg w-full" placeholder="Fan Part Number">
                                 </div>
                             </div>
-
                             <div class="w-full">
                                 <label class="flex items-center gap-2 sm:gap-3 cursor-pointer hover:text-blue-600 transition-colors bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm w-full">
                                     <input type="checkbox" id="part-dcjack" class="custom-checkbox shrink-0" onchange="techApp.togglePartDetails('dcjack')"> DC Power Jack
@@ -382,7 +426,6 @@
                                     <input type="text" id="part-dcjack-type" class="custom-input py-2 text-[10px] sm:text-xs bg-white rounded-lg w-full" placeholder="Cable type or Pin count?">
                                 </div>
                             </div>
-
                             <div class="w-full">
                                 <label class="flex items-center gap-2 sm:gap-3 cursor-pointer hover:text-blue-600 transition-colors bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm w-full">
                                     <input type="checkbox" id="part-keyboard" class="custom-checkbox shrink-0" onchange="techApp.togglePartDetails('keyboard')"> Keyboard
@@ -395,7 +438,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="w-full">
                                 <label class="flex items-center gap-2 sm:gap-3 cursor-pointer hover:text-blue-600 transition-colors bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm w-full">
                                     <input type="checkbox" id="part-chassis" class="custom-checkbox shrink-0" onchange="techApp.togglePartDetails('chassis')"> Chassis / Hinges
@@ -404,7 +446,6 @@
                                     <input type="text" id="part-chassis-desc" class="custom-input py-2 text-[10px] sm:text-xs bg-white rounded-lg w-full" placeholder="Which part? (Bottom base etc)">
                                 </div>
                             </div>
-
                             <div class="w-full">
                                 <label class="flex items-center gap-2 sm:gap-3 cursor-pointer hover:text-blue-600 transition-colors bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm w-full">
                                     <input type="checkbox" id="part-paste" class="custom-checkbox shrink-0" onchange="techApp.togglePartDetails('paste')"> Thermal Paste / Pads
@@ -460,10 +501,7 @@
                         <div class="flex-1 w-full">
                             <p class="text-[10px] sm:text-[11px] text-purple-600 font-black uppercase tracking-widest mb-1 sm:mb-2">Software Project</p>
                             <h2 class="text-2xl sm:text-3xl font-black text-slate-800 font-mono tracking-tight" id="soft-disp-ref">SFT-0000</h2>
-                            
-                            <!-- ALL FIELDS FULLY EDITABLE WITH DATA-MODIFIED TRACKING -->
                             <input type="text" id="soft-disp-project" class="custom-input text-lg sm:text-xl font-black text-slate-700 mt-2 w-full border-transparent hover:border-slate-200 focus:bg-white transition-all shadow-none px-2 py-1" placeholder="Project Name" oninput="this.dataset.modified='true'">
-                            
                             <div class="flex items-center mt-1 w-full">
                                 <i class="fa-solid fa-building text-slate-400 mr-2 ml-2"></i>
                                 <input type="text" id="soft-disp-client" class="custom-input text-xs sm:text-sm font-medium text-slate-500 w-full border-transparent hover:border-slate-200 focus:bg-white transition-all shadow-none px-2 py-1" placeholder="Client Name" oninput="this.dataset.modified='true'">
@@ -519,23 +557,20 @@
                     <h2 class="text-sm sm:text-base font-black text-slate-800 flex items-center gap-2 sm:gap-3 uppercase tracking-tight"><i class="fa-solid fa-terminal text-purple-500 bg-purple-100 p-1.5 sm:p-2 rounded-lg"></i> Developer Controls</h2>
                 </div>
                 <div class="p-6 sm:p-8 space-y-6 sm:space-y-8 overflow-y-auto flex-1 w-full">
-                    
                     <div class="w-full">
                         <label class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest mb-2 sm:mb-3 ml-1">Update Project Phase</label>
                         <select id="update-soft-status" class="custom-input font-bold text-slate-800 bg-slate-50 border-slate-200 rounded-xl py-3 sm:py-4 w-full text-xs sm:text-sm" onchange="this.dataset.modified='true'">
-                            <option value="Requirements Gathering" class="text-slate-600">Requirements Gathering</option>
-                            <option value="UI/UX Design" class="text-purple-600">UI/UX Design</option>
-                            <option value="In Development" class="text-blue-600">In Development</option>
-                            <option value="Testing & QA" class="text-amber-600">Testing & QA</option>
-                            <option value="Deployed / Completed" class="text-emerald-600">Deployed / Completed</option>
+                            <option value="Requirements Gathering">Requirements Gathering</option>
+                            <option value="UI/UX Design">UI/UX Design</option>
+                            <option value="In Development">In Development</option>
+                            <option value="Testing & QA">Testing & QA</option>
+                            <option value="Deployed / Completed">Deployed / Completed</option>
                         </select>
                     </div>
-
                     <div class="w-full">
                         <label class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest mb-2 sm:mb-3 ml-1">Development Notes / Commits</label>
                         <textarea id="update-soft-notes" class="custom-input h-48 sm:h-56 resize-none text-xs sm:text-sm leading-relaxed rounded-xl py-3 sm:py-4 w-full" placeholder="Log progress, milestone completions, or specific API/Repo changes..." oninput="this.dataset.modified='true'"></textarea>
                     </div>
-
                     <div class="w-full">
                         <label class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest mb-2 sm:mb-3 ml-1">Assigned Developer</label>
                         <input type="text" id="update-soft-dev" class="custom-input rounded-xl font-bold py-2.5 sm:py-3 text-purple-600 bg-purple-50/50 border-purple-100 focus:bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all w-full text-sm" placeholder="Enter Developer Name" oninput="this.dataset.modified='true'">
@@ -554,13 +589,12 @@
             <main class="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 w-full">
                 <div class="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6">
                     
+                    <!-- Header -->
                     <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6 w-full">
                         <div class="flex-1 w-full">
                             <p class="text-[10px] sm:text-[11px] text-emerald-600 font-black uppercase tracking-widest mb-1 sm:mb-2">Support Contract File</p>
                             <h2 class="text-2xl sm:text-3xl font-black text-slate-800 font-mono tracking-tight" id="sup-disp-ref">SUP-0000</h2>
-                            
                             <input type="text" id="sup-disp-biz" class="custom-input text-lg sm:text-xl font-black text-slate-700 mt-2 w-full border-transparent hover:border-slate-200 focus:bg-white transition-all shadow-none px-2 py-1" placeholder="Business Name" oninput="this.dataset.modified='true'">
-                            
                             <div class="flex items-center mt-1 w-full">
                                 <i class="fa-solid fa-user-tie text-slate-400 mr-2 ml-2"></i>
                                 <input type="text" id="sup-disp-contact" class="custom-input text-xs sm:text-sm font-medium text-slate-500 w-full border-transparent hover:border-slate-200 focus:bg-white transition-all shadow-none px-2 py-1" placeholder="Primary Contact" oninput="this.dataset.modified='true'">
@@ -575,6 +609,7 @@
                         </div>
                     </div>
 
+                    <!-- Contract & Scope -->
                     <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 w-full">
                         <h3 class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-400 mb-4 sm:mb-6 border-b border-slate-100 pb-3">Contract & Scope Overview</h3>
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 w-full mb-6">
@@ -593,47 +628,93 @@
                         </div>
                     </div>
 
+                    <!-- Registered Devices -->
                     <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 w-full">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 sm:mb-6">
                             <h3 class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-400">Registered Devices Under Contract</h3>
                             <span id="sup-disp-device-count" class="text-[10px] font-bold bg-slate-100 text-slate-500 px-3 py-1 rounded-full">0 Devices</span>
                         </div>
-                        <div id="sup-disp-devices-list" class="space-y-3 max-h-64 overflow-y-auto">
-                            <!-- Devices injected here -->
+                        <div id="sup-disp-devices-list" class="space-y-3 max-h-64 overflow-y-auto"></div>
+                    </div>
+
+                    <!-- ====================================================
+                         ON-SITE PHOTO EVIDENCE (from Employee Portal uploads)
+                         ==================================================== -->
+                    <div id="sup-photos-container" class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 hidden w-full">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-5">
+                            <h3 class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                <i class="fa-solid fa-camera text-emerald-500"></i> On-Site Photo Evidence
+                            </h3>
+                            <span class="text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 shadow-sm animate-pulse">
+                                <i class="fa-solid fa-satellite-dish mr-1"></i> Live Sync
+                            </span>
                         </div>
+                        <p class="text-[10px] text-slate-400 font-medium mb-4">Photos captured on-site by technicians via the employee portal. Click to enlarge.</p>
+                        <div id="sup-photos-gallery" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4"></div>
                     </div>
 
                 </div>
             </main>
 
+            <!-- ====================================================
+                 SUPPORT ACTION LOG SIDEBAR (fully parsed visit logs)
+                 ==================================================== -->
             <aside class="w-full md:w-1/3 lg:max-w-sm xl:max-w-[420px] bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-[-20px_0_40px_rgba(0,0,0,0.03)] z-20">
                 <div class="p-6 sm:p-8 border-b border-slate-100 bg-slate-50/50 backdrop-blur-md">
-                    <h2 class="text-sm sm:text-base font-black text-slate-800 flex items-center gap-2 sm:gap-3 uppercase tracking-tight"><i class="fa-solid fa-headset text-emerald-500 bg-emerald-100 p-1.5 sm:p-2 rounded-lg"></i> Support Action Log</h2>
+                    <h2 class="text-sm sm:text-base font-black text-slate-800 flex items-center gap-2 sm:gap-3 uppercase tracking-tight">
+                        <i class="fa-solid fa-headset text-emerald-500 bg-emerald-100 p-1.5 sm:p-2 rounded-lg"></i> Support Action Log
+                    </h2>
                 </div>
-                <div class="p-6 sm:p-8 space-y-6 sm:space-y-8 overflow-y-auto flex-1 w-full">
+
+                <div class="flex-1 overflow-y-auto flex flex-col">
                     
-                    <div class="w-full">
-                        <label class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest mb-2 sm:mb-3 ml-1">Contract Status</label>
-                        <select id="update-sup-status" class="custom-input font-bold text-slate-800 bg-slate-50 border-slate-200 rounded-xl py-3 sm:py-4 w-full text-xs sm:text-sm" onchange="this.dataset.modified='true'">
-                            <option value="Active" class="text-emerald-600">Active</option>
-                            <option value="On Hold" class="text-amber-600">On Hold</option>
-                            <option value="Expired" class="text-red-600">Expired</option>
-                            <option value="Terminated" class="text-slate-600">Terminated</option>
-                        </select>
+                    <!-- Contract Status + New Note (always visible at top) -->
+                    <div class="p-6 sm:p-8 space-y-5 border-b border-slate-100 shrink-0">
+                        <div class="w-full">
+                            <label class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest mb-2 ml-1">Contract Status</label>
+                            <select id="update-sup-status" class="custom-input font-bold text-slate-800 bg-slate-50 border-slate-200 rounded-xl py-3 sm:py-4 w-full text-xs sm:text-sm" onchange="this.dataset.modified='true'">
+                                <option value="Active">Active</option>
+                                <option value="On Hold">On Hold</option>
+                                <option value="Expired">Expired</option>
+                                <option value="Terminated">Terminated</option>
+                            </select>
+                        </div>
+
+                        <div class="w-full">
+                            <label class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest mb-2 ml-1">
+                                <i class="fa-solid fa-plus-circle text-emerald-500 mr-1"></i> Append New Note
+                            </label>
+                            <textarea id="update-sup-notes" class="custom-input h-28 resize-none text-xs sm:text-sm leading-relaxed rounded-xl py-3 sm:py-4 w-full" placeholder="Add a quick note, action, or follow-up..." oninput="this.dataset.modified='true'"></textarea>
+                        </div>
+
+                        <div class="w-full">
+                            <label class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest mb-2 ml-1">Technician / Engineer</label>
+                            <input type="text" id="update-sup-tech" class="custom-input rounded-xl font-bold py-2.5 sm:py-3 text-emerald-600 bg-emerald-50/50 border-emerald-100 focus:bg-white focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all w-full text-sm" placeholder="Enter Tech Name" oninput="this.dataset.modified='true'">
+                        </div>
                     </div>
 
-                    <div class="w-full">
-                        <label class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest mb-2 sm:mb-3 ml-1">Maintenance Notes / Visit Log</label>
-                        <textarea id="update-sup-notes" class="custom-input h-48 sm:h-56 resize-none text-xs sm:text-sm leading-relaxed rounded-xl py-3 sm:py-4 w-full" placeholder="Log site visits, remote support actions, resolved issues, hardware deployments..." oninput="this.dataset.modified='true'"></textarea>
+                    <!-- ====================================================
+                         VISIT LOG FEED — parsed structured entries + raw notes
+                         ==================================================== -->
+                    <div class="flex-1 overflow-y-auto p-6 sm:p-8 space-y-4 bg-slate-50/50" id="sup-log-feed">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                <i class="fa-solid fa-timeline text-emerald-400"></i> Visit History
+                            </h4>
+                            <span id="sup-log-count" class="text-[9px] font-bold bg-white text-slate-400 px-2 py-1 rounded-full border border-slate-200">0 entries</span>
+                        </div>
+                        <div id="sup-log-entries" class="space-y-3">
+                            <div class="text-center text-[11px] text-slate-400 py-6 italic flex flex-col items-center gap-2">
+                                <i class="fa-regular fa-clock-rotate-left text-2xl text-slate-300"></i>
+                                No visit logs yet.
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="w-full">
-                        <label class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest mb-2 sm:mb-3 ml-1">Technician / Engineer</label>
-                        <input type="text" id="update-sup-tech" class="custom-input rounded-xl font-bold py-2.5 sm:py-3 text-emerald-600 bg-emerald-50/50 border-emerald-100 focus:bg-white focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all w-full text-sm" placeholder="Enter Tech Name" oninput="this.dataset.modified='true'">
-                    </div>
                 </div>
+
                 <div class="p-6 sm:p-8 border-t border-slate-100 bg-white shrink-0 shadow-[0_-10px_20px_rgba(0,0,0,0.02)] w-full">
-                    <button onclick="techApp.initiateSignoff('support')" class="w-full bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-bold py-4 sm:py-5 rounded-full shadow-[0_10px_20px_-5px_rgba(15,23,42,0.4)] transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base shimmer-btn">
+                    <button onclick="techApp.initiateSignoff('support')" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold py-4 sm:py-5 rounded-full shadow-[0_10px_20px_-5px_rgba(5,150,105,0.4)] transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base shimmer-btn">
                         <i class="fa-solid fa-signature text-lg sm:text-xl"></i> Authorize & Save Log
                     </button>
                 </div>
@@ -659,6 +740,200 @@
         const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dqkujefxj/image/upload";
         const CLOUDINARY_PRESET = "banter_box"; 
 
+        // ==========================================
+        // LIGHTBOX HELPERS
+        // ==========================================
+        function openLightbox(src) {
+            const lb = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            img.src = src;
+            lb.classList.add('active');
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+
+        // ==========================================
+        // VISIT LOG PARSER
+        // ==========================================
+        /**
+         * Parses the raw maintenanceNotes string (which may contain multiple
+         * formatted visit blocks separated by "====...====" delimiters) into
+         * an array of structured visit objects. Falls back to raw text display
+         * for any content that doesn't match the expected format.
+         */
+        function parseVisitLogs(rawNotes) {
+            if (!rawNotes || !rawNotes.trim()) return [];
+
+            const entries = [];
+
+            // Split on the ==== block separator lines
+            const blocks = rawNotes.split(/={4,}\n?/g).map(b => b.trim()).filter(b => b.length > 0);
+
+            blocks.forEach((block, idx) => {
+                // Try to detect if this is a structured visit log block
+                const isStructured = block.includes('VISIT LOG:') || block.includes('TECHNICIAN:') || block.includes('TASKS COMPLETED:');
+
+                if (isStructured) {
+                    const entry = { type: 'structured', raw: block };
+
+                    // Date
+                    const dateMatch = block.match(/VISIT LOG:\s*(.+)/);
+                    if (dateMatch) entry.date = dateMatch[1].trim();
+
+                    // Visit Type
+                    const typeMatch = block.match(/TYPE:\s*(.+)/);
+                    if (typeMatch) entry.visitType = typeMatch[1].trim();
+
+                    // Technician
+                    const techMatch = block.match(/TECHNICIAN:\s*(.+)/);
+                    if (techMatch) entry.technician = techMatch[1].trim();
+
+                    // Tasks checklist (lines starting with "  - ")
+                    const tasksSection = block.match(/TASKS COMPLETED:\n([\s\S]*?)(?:\n[A-Z]|\n====|$)/);
+                    if (tasksSection) {
+                        entry.tasks = tasksSection[1]
+                            .split('\n')
+                            .map(t => t.replace(/^\s*-\s*/, '').trim())
+                            .filter(t => t && t !== 'No standard checklist items selected.');
+                    }
+
+                    // Parts
+                    const partsMatch = block.match(/PARTS USED:\s*(.+)/);
+                    if (partsMatch) entry.parts = partsMatch[1].trim();
+
+                    // Next Steps
+                    const nextMatch = block.match(/NEXT STEPS:\s*(.+)/);
+                    if (nextMatch) entry.nextSteps = nextMatch[1].trim();
+
+                    // Notes (multi-line)
+                    const notesSection = block.match(/NOTES:\s*\n([\s\S]*?)(?:\nCLIENT SIG|\n====|$)/);
+                    if (notesSection) entry.notes = notesSection[1].trim();
+
+                    // Signature (URL or placeholder)
+                    const sigSection = block.match(/CLIENT SIG \(([^)]+)\):\s*\n(.+)/);
+                    if (sigSection) {
+                        entry.sigName = sigSection[1].trim();
+                        entry.sigUrl = sigSection[2].trim();
+                    }
+
+                    entries.push(entry);
+                } else if (block.length > 0) {
+                    // Raw / legacy note block
+                    entries.push({ type: 'raw', raw: block });
+                }
+            });
+
+            return entries;
+        }
+
+        /**
+         * Renders parsed visit log entries into the #sup-log-entries container.
+         */
+        function renderVisitLogs(entries) {
+            const container = document.getElementById('sup-log-entries');
+            const countEl = document.getElementById('sup-log-count');
+            if (!container) return;
+
+            if (!entries || entries.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-[11px] text-slate-400 py-6 italic flex flex-col items-center gap-2">
+                        <i class="fa-regular fa-clock-rotate-left text-2xl text-slate-300"></i>
+                        No visit logs yet.
+                    </div>`;
+                if (countEl) countEl.innerText = '0 entries';
+                return;
+            }
+
+            if (countEl) countEl.innerText = `${entries.length} entr${entries.length === 1 ? 'y' : 'ies'}`;
+
+            container.innerHTML = '';
+            entries.forEach((entry, i) => {
+                const div = document.createElement('div');
+                div.className = 'visit-log-card animate-fade-in-up';
+                div.style.animationDelay = `${i * 60}ms`;
+
+                if (entry.type === 'structured') {
+                    const hasTasks = entry.tasks && entry.tasks.length > 0;
+                    const hasSig = entry.sigUrl && !entry.sigUrl.includes('[Image Upload Failed');
+                    const isCloudUrl = hasSig && (entry.sigUrl.startsWith('https://res.cloudinary') || entry.sigUrl.startsWith('http'));
+
+                    div.innerHTML = `
+                        <div class="log-header">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-clipboard-check text-emerald-500 text-sm"></i>
+                                <span class="font-black text-slate-700 text-xs">${entry.date || 'Unknown Date'}</span>
+                            </div>
+                            <span class="log-badge">${entry.visitType || 'Site Visit'}</span>
+                        </div>
+
+                        ${entry.technician ? `
+                        <div class="log-field">
+                            <span class="log-label"><i class="fa-solid fa-user-helmet-safety mr-1"></i>Technician</span>
+                            <span class="log-value font-bold text-emerald-700">${entry.technician}</span>
+                        </div>` : ''}
+
+                        ${hasTasks ? `
+                        <div class="log-field">
+                            <span class="log-label"><i class="fa-solid fa-list-check mr-1"></i>Tasks Completed</span>
+                            <div class="mt-1 space-y-1">
+                                ${entry.tasks.map(t => `
+                                    <div class="checklist-item">
+                                        <i class="fa-solid fa-circle-check text-emerald-500 text-xs shrink-0"></i>
+                                        <span>${t}</span>
+                                    </div>`).join('')}
+                            </div>
+                        </div>` : ''}
+
+                        ${entry.parts && entry.parts !== 'None' ? `
+                        <div class="log-field">
+                            <span class="log-label"><i class="fa-solid fa-box-open mr-1"></i>Parts / Consumables</span>
+                            <span class="log-value">${entry.parts}</span>
+                        </div>` : ''}
+
+                        ${entry.nextSteps && entry.nextSteps !== 'None' ? `
+                        <div class="log-field">
+                            <span class="log-label"><i class="fa-solid fa-forward mr-1"></i>Recommendations</span>
+                            <span class="log-value">${entry.nextSteps}</span>
+                        </div>` : ''}
+
+                        ${entry.notes ? `
+                        <div class="log-field">
+                            <span class="log-label"><i class="fa-solid fa-note-sticky mr-1"></i>Notes</span>
+                            <span class="log-value whitespace-pre-line">${entry.notes}</span>
+                        </div>` : ''}
+
+                        ${entry.sigName ? `
+                        <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-signature text-emerald-400 text-xs"></i>
+                                <span class="text-[10px] font-bold text-slate-500">Signed: ${entry.sigName}</span>
+                            </div>
+                            ${isCloudUrl ? `<a href="${entry.sigUrl}" target="_blank" class="sig-link">View Sig →</a>` : 
+                              (entry.sigUrl ? `<span class="text-[9px] text-red-400 font-semibold">Upload failed</span>` : '')}
+                        </div>` : ''}
+                    `;
+                } else {
+                    // Raw/legacy block
+                    div.innerHTML = `
+                        <div class="log-header">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-file-lines text-slate-400 text-sm"></i>
+                                <span class="font-black text-slate-600 text-xs">Note / Legacy Entry</span>
+                            </div>
+                            <span class="log-badge" style="background:#f1f5f9;color:#475569;border-color:#e2e8f0">raw</span>
+                        </div>
+                        <p class="log-value whitespace-pre-line text-slate-600 leading-relaxed">${entry.raw}</p>
+                    `;
+                }
+
+                container.appendChild(div);
+            });
+        }
+
+        // ==========================================
+        // MAIN APPLICATION CLASS
+        // ==========================================
         class TechnicianPortal {
             constructor() {
                 this.currentMode = 'hardware'; 
@@ -688,28 +963,22 @@
             }
 
             // ==========================================
-            // REAL-TIME DATA SYNC & PERSISTENCE
+            // REAL-TIME DATA SYNC
             // ==========================================
             listenForData() {
                 this.db.ref('reports').on('value', snap => {
                     this.hardwareDataAll = [];
                     this.hardwareDataPending = [];
                     snap.forEach(child => {
-                        let val = child.val();
-                        val.key = child.key;
+                        let val = child.val(); val.key = child.key;
                         this.hardwareDataAll.push(val); 
                         if(val.status === 'Pending') this.hardwareDataPending.push(val);
                     });
                     this.hardwareDataPending.sort((a,b) => b.timestamp - a.timestamp);
                     if(this.currentMode === 'hardware') this.renderQueue();
-
                     if(this.currentMode === 'hardware' && this.currentDbKey) {
-                        const updatedRecord = this.hardwareDataAll.find(r => r.key === this.currentDbKey);
-                        if(updatedRecord) {
-                            this.currentRecord = updatedRecord;
-                            this.populateHardwareDisplayOnly(); 
-                            this.renderGalleries(updatedRecord);
-                        }
+                        const upd = this.hardwareDataAll.find(r => r.key === this.currentDbKey);
+                        if(upd) { this.currentRecord = upd; this.populateHardwareDisplayOnly(); this.renderGalleries(upd); }
                     }
                     this.checkSessionState();
                 });
@@ -718,22 +987,15 @@
                     this.softwareDataAll = [];
                     this.softwareDataPending = [];
                     snap.forEach(child => {
-                        let val = child.val();
-                        val.key = child.key;
+                        let val = child.val(); val.key = child.key;
                         this.softwareDataAll.push(val);
-                        if(val.status === 'Requirements Gathering' || val.status === 'Pending') {
-                            this.softwareDataPending.push(val);
-                        }
+                        if(val.status === 'Requirements Gathering' || val.status === 'Pending') this.softwareDataPending.push(val);
                     });
                     this.softwareDataPending.sort((a,b) => b.timestamp - a.timestamp);
                     if(this.currentMode === 'software') this.renderQueue();
-
                     if(this.currentMode === 'software' && this.currentDbKey) {
-                        const updatedRecord = this.softwareDataAll.find(r => r.key === this.currentDbKey);
-                        if(updatedRecord) {
-                            this.currentRecord = updatedRecord;
-                            this.populateSoftwareDisplayOnly(); 
-                        }
+                        const upd = this.softwareDataAll.find(r => r.key === this.currentDbKey);
+                        if(upd) { this.currentRecord = upd; this.populateSoftwareDisplayOnly(); }
                     }
                     this.checkSessionState();
                 });
@@ -742,22 +1004,15 @@
                     this.supportDataAll = [];
                     this.supportDataActive = [];
                     snap.forEach(child => {
-                        let val = child.val();
-                        val.key = child.key;
+                        let val = child.val(); val.key = child.key;
                         this.supportDataAll.push(val);
-                        if(val.status === 'Active' || val.status === 'On Hold') {
-                            this.supportDataActive.push(val);
-                        }
+                        if(val.status === 'Active' || val.status === 'On Hold') this.supportDataActive.push(val);
                     });
                     this.supportDataActive.sort((a,b) => b.timestamp - a.timestamp);
                     if(this.currentMode === 'support') this.renderQueue();
-
                     if(this.currentMode === 'support' && this.currentDbKey) {
-                        const updatedRecord = this.supportDataAll.find(r => r.key === this.currentDbKey);
-                        if(updatedRecord) {
-                            this.currentRecord = updatedRecord;
-                            this.populateSupportDisplayOnly(); 
-                        }
+                        const upd = this.supportDataAll.find(r => r.key === this.currentDbKey);
+                        if(upd) { this.currentRecord = upd; this.populateSupportDisplayOnly(); }
                     }
                     this.checkSessionState();
                 });
@@ -783,7 +1038,6 @@
 
             setMode(mode) {
                 this.currentMode = mode;
-                
                 const tabHW = document.getElementById('tab-hardware');
                 const tabSW = document.getElementById('tab-software');
                 const tabSup = document.getElementById('tab-support');
@@ -804,34 +1058,25 @@
                 if (mode === 'hardware') {
                     if (tabHW) tabHW.className = activeTabClass;
                     if (title) title.innerText = "Find Repair File";
-                    if (desc) desc.innerText = "Enter the Reference ID below to exclusively load a client's specific secure file.";
+                    if (desc) desc.innerText = "Enter the Reference ID to load a client's specific secure file.";
                     if (prefix) prefix.innerText = "RGT-";
-                    if (searchIcon) {
-                        searchIcon.className = "w-16 h-16 sm:w-20 sm:h-20 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 transition-all duration-500 shadow-inner";
-                        searchIcon.innerHTML = '<i class="fa-solid fa-screwdriver-wrench text-2xl sm:text-3xl"></i>';
-                    }
+                    if (searchIcon) { searchIcon.className = "w-16 h-16 sm:w-20 sm:h-20 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 transition-all duration-500 shadow-inner"; searchIcon.innerHTML = '<i class="fa-solid fa-screwdriver-wrench text-2xl sm:text-3xl"></i>'; }
                     if (btnLoad) btnLoad.innerText = "Load Repair Data";
                     if (qTitle) qTitle.innerHTML = '<i class="fa-solid fa-clock text-amber-500 text-base sm:text-lg"></i> Pending Hardware Queue';
                 } else if (mode === 'software') {
                     if (tabSW) tabSW.className = activeTabClass;
                     if (title) title.innerText = "Find Software Project";
-                    if (desc) desc.innerText = "Enter the Project ID below to explicitly load repo links and specs.";
+                    if (desc) desc.innerText = "Enter the Project ID to load repo links and specs.";
                     if (prefix) prefix.innerText = "SFT-";
-                    if (searchIcon) {
-                        searchIcon.className = "w-16 h-16 sm:w-20 sm:h-20 bg-purple-50 text-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 transition-all duration-500 shadow-inner";
-                        searchIcon.innerHTML = '<i class="fa-solid fa-laptop-code text-2xl sm:text-3xl"></i>';
-                    }
+                    if (searchIcon) { searchIcon.className = "w-16 h-16 sm:w-20 sm:h-20 bg-purple-50 text-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 transition-all duration-500 shadow-inner"; searchIcon.innerHTML = '<i class="fa-solid fa-laptop-code text-2xl sm:text-3xl"></i>'; }
                     if (btnLoad) btnLoad.innerText = "Load Software Pipeline";
                     if (qTitle) qTitle.innerHTML = '<i class="fa-solid fa-code-branch text-purple-500 text-base sm:text-lg"></i> Pending Software Projects';
                 } else if (mode === 'support') {
                     if (tabSup) tabSup.className = activeTabClass;
                     if (title) title.innerText = "Find Support Contract";
-                    if (desc) desc.innerText = "Enter the Business ID below to exclusively load active SLA terms and notes.";
+                    if (desc) desc.innerText = "Enter the Business ID to load active SLA terms and logs.";
                     if (prefix) prefix.innerText = "SUP-";
-                    if (searchIcon) {
-                        searchIcon.className = "w-16 h-16 sm:w-20 sm:h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 transition-all duration-500 shadow-inner";
-                        searchIcon.innerHTML = '<i class="fa-solid fa-building text-2xl sm:text-3xl"></i>';
-                    }
+                    if (searchIcon) { searchIcon.className = "w-16 h-16 sm:w-20 sm:h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 transition-all duration-500 shadow-inner"; searchIcon.innerHTML = '<i class="fa-solid fa-building text-2xl sm:text-3xl"></i>'; }
                     if (btnLoad) btnLoad.innerText = "Load Support Contract";
                     if (qTitle) qTitle.innerHTML = '<i class="fa-solid fa-clipboard-check text-emerald-500 text-base sm:text-lg"></i> Active Maintenance Queue';
                 }
@@ -859,7 +1104,6 @@
                         case 'In Development': return { percent: 60, color: 'bg-blue-500' };
                         case 'Testing & QA': return { percent: 80, color: 'bg-amber-500' };
                         case 'Deployed / Completed': return { percent: 100, color: 'bg-emerald-500' };
-                        case 'Pending': return { percent: 10, color: 'bg-amber-500' };
                         default: return { percent: 10, color: 'bg-slate-500' };
                     }
                 } else {
@@ -876,7 +1120,6 @@
             renderQueue() {
                 const grid = document.getElementById('queue-grid');
                 if (!grid) return;
-
                 grid.innerHTML = '';
                 const dataArray = this.currentMode === 'hardware' ? this.hardwareDataPending : (this.currentMode === 'software' ? this.softwareDataPending : this.supportDataActive);
                 const qCounter = document.getElementById('queue-counter');
@@ -891,7 +1134,6 @@
                     const card = document.createElement('div');
                     card.className = "card-hover bg-white rounded-2xl sm:rounded-3xl border border-slate-100 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.08)] overflow-hidden cursor-pointer flex flex-col h-full opacity-0 animate-fade-in-up group w-full";
                     card.style.animationDelay = `${index * 50}ms`;
-                    
                     card.onclick = () => {
                         const sRef = document.getElementById('search-ref-id');
                         if (sRef) sRef.value = rec.refId;
@@ -900,70 +1142,15 @@
 
                     if (this.currentMode === 'hardware') {
                         const prog = this.getProgressConfig('hardware', rec.status || 'Pending');
-                        card.innerHTML = `
-                            <div class="p-6 sm:p-7 flex flex-col flex-1 relative overflow-hidden group">
-                                <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                <div class="flex justify-between items-start mb-4 sm:mb-5 relative z-10">
-                                    <span class="font-mono text-[10px] sm:text-[11px] font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 tracking-widest shadow-sm">RGT-${rec.refId}</span>
-                                    <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100 shadow-sm">${rec.status}</span>
-                                </div>
-                                <h4 class="font-black text-slate-800 text-base sm:text-lg mb-2 truncate leading-tight relative z-10">${rec.device || 'Unknown Device'}</h4>
-                                <p class="text-xs sm:text-sm font-medium text-slate-500 truncate relative z-10"><i class="fa-solid fa-user mr-2 text-slate-400"></i>${rec.clientName}</p>
-                                <div class="mt-3 w-full bg-slate-100 rounded-full h-1.5 mb-1 overflow-hidden relative z-10">
-                                    <div class="${prog.color} h-1.5 rounded-full transition-all duration-500" style="width: ${prog.percent}%"></div>
-                                </div>
-                                <div class="mt-auto pt-5 sm:pt-6 flex justify-between items-center border-t border-slate-50 mt-5 sm:mt-6 relative z-10">
-                                    <span class="text-slate-400 font-bold text-[10px] sm:text-xs"><i class="fa-regular fa-clock mr-1"></i> ${this.timeAgo(rec.timestamp)}</span>
-                                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 group-hover:shadow-lg group-hover:shadow-blue-500/30 group-hover:scale-110">
-                                        <i class="fa-solid fa-arrow-right"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+                        card.innerHTML = `<div class="p-6 sm:p-7 flex flex-col flex-1 relative overflow-hidden group"><div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div><div class="flex justify-between items-start mb-4 sm:mb-5 relative z-10"><span class="font-mono text-[10px] sm:text-[11px] font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 tracking-widest shadow-sm">RGT-${rec.refId}</span><span class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100 shadow-sm">${rec.status}</span></div><h4 class="font-black text-slate-800 text-base sm:text-lg mb-2 truncate leading-tight relative z-10">${rec.device || 'Unknown Device'}</h4><p class="text-xs sm:text-sm font-medium text-slate-500 truncate relative z-10"><i class="fa-solid fa-user mr-2 text-slate-400"></i>${rec.clientName}</p><div class="mt-3 w-full bg-slate-100 rounded-full h-1.5 mb-1 overflow-hidden relative z-10"><div class="${prog.color} h-1.5 rounded-full" style="width:${prog.percent}%"></div></div><div class="mt-auto pt-5 sm:pt-6 flex justify-between items-center border-t border-slate-50 mt-5 sm:mt-6 relative z-10"><span class="text-slate-400 font-bold text-[10px] sm:text-xs"><i class="fa-regular fa-clock mr-1"></i>${this.timeAgo(rec.timestamp)}</span><div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 group-hover:shadow-lg group-hover:shadow-blue-500/30 group-hover:scale-110"><i class="fa-solid fa-arrow-right"></i></div></div></div>`;
                     } else if (this.currentMode === 'software') {
                         const prog = this.getProgressConfig('software', rec.status || 'Requirements Gathering');
-                        card.innerHTML = `
-                            <div class="p-6 sm:p-7 flex flex-col flex-1 relative overflow-hidden group">
-                                <div class="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                <div class="flex justify-between items-start mb-4 sm:mb-5 relative z-10">
-                                    <span class="font-mono text-[10px] sm:text-[11px] font-black text-purple-600 bg-purple-50 px-3 py-1.5 rounded-full border border-purple-100 tracking-widest shadow-sm">SFT-${rec.refId}</span>
-                                    <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100 shadow-sm">Pending</span>
-                                </div>
-                                <h4 class="font-black text-slate-800 text-base sm:text-lg mb-2 truncate leading-tight relative z-10">${rec.projectName || 'Unnamed Project'}</h4>
-                                <p class="text-xs sm:text-sm font-medium text-slate-500 truncate relative z-10"><i class="fa-solid fa-building mr-2 text-slate-400"></i>${rec.clientName}</p>
-                                <div class="mt-3 w-full bg-slate-100 rounded-full h-1.5 mb-1 overflow-hidden relative z-10">
-                                    <div class="${prog.color} h-1.5 rounded-full transition-all duration-500" style="width: ${prog.percent}%"></div>
-                                </div>
-                                <div class="mt-auto pt-5 sm:pt-6 flex justify-between items-center border-t border-slate-50 mt-5 sm:mt-6 relative z-10">
-                                    <span class="text-slate-500 font-bold text-[9px] sm:text-[10px] uppercase tracking-wider bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">${rec.platform}</span>
-                                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-50 flex items-center justify-center text-purple-500 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 group-hover:shadow-lg group-hover:shadow-purple-500/30 group-hover:scale-110">
-                                        <i class="fa-solid fa-laptop-code"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+                        card.innerHTML = `<div class="p-6 sm:p-7 flex flex-col flex-1 relative overflow-hidden group"><div class="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div><div class="flex justify-between items-start mb-4 sm:mb-5 relative z-10"><span class="font-mono text-[10px] sm:text-[11px] font-black text-purple-600 bg-purple-50 px-3 py-1.5 rounded-full border border-purple-100 tracking-widest shadow-sm">SFT-${rec.refId}</span><span class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100 shadow-sm">Pending</span></div><h4 class="font-black text-slate-800 text-base sm:text-lg mb-2 truncate leading-tight relative z-10">${rec.projectName || 'Unnamed Project'}</h4><p class="text-xs sm:text-sm font-medium text-slate-500 truncate relative z-10"><i class="fa-solid fa-building mr-2 text-slate-400"></i>${rec.clientName}</p><div class="mt-3 w-full bg-slate-100 rounded-full h-1.5 mb-1 overflow-hidden relative z-10"><div class="${prog.color} h-1.5 rounded-full" style="width:${prog.percent}%"></div></div><div class="mt-auto pt-5 sm:pt-6 flex justify-between items-center border-t border-slate-50 mt-5 sm:mt-6 relative z-10"><span class="text-slate-500 font-bold text-[9px] sm:text-[10px] uppercase tracking-wider bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">${rec.platform}</span><div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-50 flex items-center justify-center text-purple-500 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 group-hover:shadow-lg group-hover:shadow-purple-500/30 group-hover:scale-110"><i class="fa-solid fa-laptop-code"></i></div></div></div>`;
                     } else if (this.currentMode === 'support') {
                         const prog = this.getProgressConfig('support', rec.status || 'Active');
-                        card.innerHTML = `
-                            <div class="p-6 sm:p-7 flex flex-col flex-1 relative overflow-hidden group">
-                                <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                <div class="flex justify-between items-start mb-4 sm:mb-5 relative z-10">
-                                    <span class="font-mono text-[10px] sm:text-[11px] font-black text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100 tracking-widest shadow-sm">SUP-${rec.refId}</span>
-                                    <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100 shadow-sm">${rec.status}</span>
-                                </div>
-                                <h4 class="font-black text-slate-800 text-base sm:text-lg mb-2 truncate leading-tight relative z-10">${rec.bizName || 'Unknown Business'}</h4>
-                                <p class="text-xs sm:text-sm font-medium text-slate-500 truncate relative z-10"><i class="fa-solid fa-briefcase mr-2 text-slate-400"></i>${rec.contractType || '---'}</p>
-                                <div class="mt-3 w-full bg-slate-100 rounded-full h-1.5 mb-1 overflow-hidden relative z-10">
-                                    <div class="${prog.color} h-1.5 rounded-full transition-all duration-500" style="width: ${prog.percent}%"></div>
-                                </div>
-                                <div class="mt-auto pt-5 sm:pt-6 flex justify-between items-center border-t border-slate-50 mt-5 sm:mt-6 relative z-10">
-                                    <span class="text-slate-500 font-bold text-[9px] sm:text-[10px] uppercase tracking-wider bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200"><i class="fa-solid fa-desktop text-slate-400 mr-1"></i> ${rec.devices ? (Array.isArray(rec.devices) ? rec.devices.length : Object.keys(rec.devices).length) : 0} Devices</span>
-                                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-500/30 group-hover:scale-110">
-                                        <i class="fa-solid fa-headset"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+                        const devCount = rec.devices ? (Array.isArray(rec.devices) ? rec.devices.length : Object.keys(rec.devices).length) : 0;
+                        const photoCount = rec.photos ? (Array.isArray(rec.photos) ? rec.photos.length : 0) : 0;
+                        card.innerHTML = `<div class="p-6 sm:p-7 flex flex-col flex-1 relative overflow-hidden group"><div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div><div class="flex justify-between items-start mb-4 sm:mb-5 relative z-10"><span class="font-mono text-[10px] sm:text-[11px] font-black text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100 tracking-widest shadow-sm">SUP-${rec.refId}</span><span class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100 shadow-sm">${rec.status}</span></div><h4 class="font-black text-slate-800 text-base sm:text-lg mb-2 truncate leading-tight relative z-10">${rec.bizName || 'Unknown Business'}</h4><p class="text-xs sm:text-sm font-medium text-slate-500 truncate relative z-10"><i class="fa-solid fa-briefcase mr-2 text-slate-400"></i>${rec.contractType || '---'}</p><div class="mt-3 w-full bg-slate-100 rounded-full h-1.5 mb-1 overflow-hidden relative z-10"><div class="${prog.color} h-1.5 rounded-full" style="width:${prog.percent}%"></div></div><div class="mt-auto pt-5 sm:pt-6 flex justify-between items-center border-t border-slate-50 mt-5 sm:mt-6 relative z-10"><div class="flex gap-2"><span class="text-slate-500 font-bold text-[9px] uppercase tracking-wider bg-slate-100 px-2 py-1 rounded-full border border-slate-200"><i class="fa-solid fa-desktop text-slate-400 mr-1"></i>${devCount}</span>${photoCount > 0 ? `<span class="text-emerald-600 font-bold text-[9px] uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100"><i class="fa-solid fa-camera mr-1"></i>${photoCount}</span>` : ''}</div><div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300 group-hover:shadow-lg group-hover:shadow-emerald-500/30 group-hover:scale-110"><i class="fa-solid fa-headset"></i></div></div></div>`;
                     }
                     grid.appendChild(card);
                 });
@@ -980,33 +1167,20 @@
 
             setupEnterKey() {
                 const srch = document.getElementById('search-ref-id');
-                if(srch) {
-                    srch.addEventListener('keypress', (e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            this.fetchRecord();
-                        }
-                    });
-                }
+                if(srch) srch.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); this.fetchRecord(); } });
             }
 
             // ==========================================
-            // FETCH RECORD (MEMORY SEARCH)
+            // FETCH RECORD
             // ==========================================
             fetchRecord() {
                 const sInp = document.getElementById('search-ref-id');
                 if (!sInp) return;
-
                 let rawRef = sInp.value.trim().toUpperCase();
-                
                 if (rawRef.startsWith('RGT-')) rawRef = rawRef.replace('RGT-', '');
                 if (rawRef.startsWith('SFT-')) rawRef = rawRef.replace('SFT-', '');
                 if (rawRef.startsWith('SUP-')) rawRef = rawRef.replace('SUP-', '');
-                
-                if (!rawRef) {
-                    this.showToast("Please enter a valid ID", "error");
-                    return;
-                }
+                if (!rawRef) { this.showToast("Please enter a valid ID", "error"); return; }
 
                 this.showLoading("Loading Workspace...");
 
@@ -1034,9 +1208,7 @@
                         document.querySelectorAll('#support-workspace [data-modified="true"]').forEach(el => delete el.dataset.modified);
                         this.populateSupportWorkspace();
                     }
-                    
                     sessionStorage.setItem('activeRecord', JSON.stringify({ mode: this.currentMode, id: rawRef }));
-                    
                     this.hideLoading();
                     this.openWorkspace();
                 } catch (err) {
@@ -1049,97 +1221,57 @@
             openWorkspace() {
                 const searchView = document.getElementById('search-view');
                 if (searchView) searchView.classList.add('opacity-0', 'scale-105', 'pointer-events-none');
-                
                 const btnBack = document.getElementById('btn-back');
                 if (btnBack) btnBack.classList.remove('hidden');
-                
                 setTimeout(() => {
                     const targetWS = this.currentMode === 'hardware' ? 'hardware-workspace' : (this.currentMode === 'software' ? 'software-workspace' : 'support-workspace');
                     const ws = document.getElementById(targetWS);
-                    if(ws) {
-                        ws.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none', 'scale-[0.98]');
-                        ws.classList.add('z-30', 'translate-y-0', 'scale-100');
-                    }
+                    if(ws) { ws.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none', 'scale-[0.98]'); ws.classList.add('z-30', 'translate-y-0', 'scale-100'); }
                 }, 300);
             }
 
             resetToSearch() {
                 this.currentRecord = null;
                 this.currentDbKey = null;
-                this.selectedFilesBefore = [];
-                this.selectedFilesAfter = [];
                 sessionStorage.removeItem('activeRecord');
-                
-                const pgBefore = document.getElementById('preview-grid-before');
-                if (pgBefore) pgBefore.innerHTML = '';
-                
-                const pgAfter = document.getElementById('preview-grid-after');
-                if (pgAfter) pgAfter.innerHTML = '';
-                
                 const sRef = document.getElementById('search-ref-id');
                 if(sRef) sRef.value = '';
-                
                 const btnB = document.getElementById('btn-back');
                 if(btnB) btnB.classList.add('hidden');
 
-                const hwWs = document.getElementById('hardware-workspace');
-                if (hwWs) {
-                    hwWs.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none', 'scale-[0.98]');
-                    hwWs.classList.remove('z-30', 'translate-y-0', 'scale-100');
-                }
-
-                const swWs = document.getElementById('software-workspace');
-                if (swWs) {
-                    swWs.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none', 'scale-[0.98]');
-                    swWs.classList.remove('z-30', 'translate-y-0', 'scale-100');
-                }
-
-                const supWs = document.getElementById('support-workspace');
-                if (supWs) {
-                    supWs.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none', 'scale-[0.98]');
-                    supWs.classList.remove('z-30', 'translate-y-0', 'scale-100');
-                }
-                
+                ['hardware-workspace','software-workspace','support-workspace'].forEach(id => {
+                    const ws = document.getElementById(id);
+                    if (ws) { ws.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none', 'scale-[0.98]'); ws.classList.remove('z-30', 'translate-y-0', 'scale-100'); }
+                });
                 setTimeout(() => {
-                    const searchView = document.getElementById('search-view');
-                    if (searchView) searchView.classList.remove('opacity-0', 'scale-105', 'pointer-events-none');
+                    const sv = document.getElementById('search-view');
+                    if (sv) sv.classList.remove('opacity-0', 'scale-105', 'pointer-events-none');
                 }, 400);
             }
 
             // ==========================================
-            // UI POPULATION: HARDWARE
+            // HARDWARE WORKSPACE
             // ==========================================
             togglePartDetails(partId) {
                 const cb = document.getElementById(`part-${partId}`);
                 const details = document.getElementById(`details-${partId}`);
-                if(cb && details) {
-                    if(cb.checked) details.classList.remove('hidden');
-                    else details.classList.add('hidden');
-                }
+                if(cb && details) { if(cb.checked) details.classList.remove('hidden'); else details.classList.add('hidden'); }
             }
 
             loadPartData(partId, data, fields) {
                 const cb = document.getElementById(`part-${partId}`);
                 if (!cb) return;
-
                 const isNeeded = (data && typeof data === 'object') ? data.needed : !!data;
                 cb.checked = isNeeded;
-                
                 if(data && typeof data === 'object') {
                     fields.forEach(f => {
                         const input = document.getElementById(`part-${partId}-${f}`);
-                        if(input) {
-                            if(input.type === 'checkbox') input.checked = data[f] || false;
-                            else input.value = data[f] || '';
-                        }
+                        if(input) { if(input.type === 'checkbox') input.checked = data[f] || false; else input.value = data[f] || ''; }
                     });
                 } else {
                     fields.forEach(f => {
                         const input = document.getElementById(`part-${partId}-${f}`);
-                        if(input) {
-                            if(input.type === 'checkbox') input.checked = false;
-                            else input.value = '';
-                        }
+                        if(input) { if(input.type === 'checkbox') input.checked = false; else input.value = ''; }
                     });
                 }
                 this.togglePartDetails(partId);
@@ -1149,7 +1281,6 @@
                 const container = document.getElementById(`existing-${divId}-container`);
                 const gallery = document.getElementById(`gallery-${divId}`);
                 if (!container || !gallery) return false;
-
                 if(urlArray && urlArray.length > 0) {
                     container.classList.remove('hidden');
                     gallery.innerHTML = '';
@@ -1157,7 +1288,7 @@
                         const img = document.createElement('img');
                         img.src = url;
                         img.className = "w-full aspect-square object-cover rounded-xl border border-slate-200 cursor-pointer hover:scale-[1.02] hover:shadow-md transition-all duration-300 shadow-sm";
-                        img.onclick = () => window.open(url, '_blank');
+                        img.onclick = () => openLightbox(url);
                         gallery.appendChild(img);
                     });
                     return true;
@@ -1172,68 +1303,44 @@
                 const hasBefore = this.renderExistingGallery('before', rec.photosBefore);
                 const hasAfter = this.renderExistingGallery('after', rec.photosAfter);
                 const hasLegacy = this.renderExistingGallery('legacy', rec.photos); 
-
                 const epc = document.getElementById('existing-photos-container');
-                if (epc) {
-                    if (hasBefore || hasAfter || hasLegacy) epc.classList.remove('hidden');
-                    else epc.classList.add('hidden');
-                }
+                if (epc) { if (hasBefore || hasAfter || hasLegacy) epc.classList.remove('hidden'); else epc.classList.add('hidden'); }
             }
             
             toggleCheck(id) {
                 const el = document.getElementById(id);
                 if (!el) return;
                 el.dataset.modified = "true";
-                if(el.classList.contains('fa-square-check')) {
-                    el.className = "fa-regular fa-square text-slate-300 text-lg sm:text-xl transition-colors";
-                } else {
-                    el.className = "fa-solid fa-square-check text-blue-500 text-lg sm:text-xl transition-colors";
-                }
+                if(el.classList.contains('fa-square-check')) { el.className = "fa-regular fa-square text-slate-300 text-lg sm:text-xl transition-colors"; }
+                else { el.className = "fa-solid fa-square-check text-blue-500 text-lg sm:text-xl transition-colors"; }
             }
 
             toggleTechCharger() {
                 const chk = document.getElementById('disp-chk-charger');
                 const container = document.getElementById('charger-specs-container');
                 const specInput = document.getElementById('disp-charger-specs');
-                
                 if (!chk || !container || !specInput) return;
-
-                if (chk.checked) {
-                    container.classList.remove('hidden');
-                    specInput.focus();
-                } else {
-                    container.classList.add('hidden');
-                    specInput.value = '';
-                }
+                if (chk.checked) { container.classList.remove('hidden'); specInput.focus(); }
+                else { container.classList.add('hidden'); specInput.value = ''; }
             }
 
             updateColorPreview() {
                 const colorInput = document.getElementById('disp-color');
                 const block = document.getElementById('color-preview-block');
                 if (!colorInput || !block) return;
-
                 const val = colorInput.value.toLowerCase().trim();
-                const colorMap = {
-                    'space gray': '#535150', 'space grey': '#535150', 'silver': '#c0c0c0',
-                    'rose gold': '#b76e79', 'midnight': '#191f28', 'starlight': '#f9f6ef',
-                    'graphite': '#3f3f3f', 'matte black': '#28282b'
-                };
+                const colorMap = { 'space gray': '#535150', 'space grey': '#535150', 'silver': '#c0c0c0', 'rose gold': '#b76e79', 'midnight': '#191f28', 'starlight': '#f9f6ef', 'graphite': '#3f3f3f', 'matte black': '#28282b' };
                 block.style.backgroundColor = colorMap[val] || val;
             }
 
             populateHardwareDisplayOnly() {
                 const rec = this.currentRecord;
-                
                 const safeSetText = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
-                const safeSetValue = (id, val) => { 
-                    const el = document.getElementById(id); 
-                    if(el && !el.dataset.modified && document.activeElement !== el) el.value = val; 
-                };
+                const safeSetValue = (id, val) => { const el = document.getElementById(id); if(el && !el.dataset.modified && document.activeElement !== el) el.value = val; };
 
                 safeSetText('disp-ref', `RGT-${rec.refId}`);
                 safeSetText('disp-client', rec.clientName || 'Unknown');
                 safeSetText('disp-status', rec.status || 'Pending');
-
                 safeSetValue('disp-device', rec.device || '');
                 safeSetValue('disp-issue', rec.issue || '');
                 safeSetValue('disp-color', rec.color || '');
@@ -1241,26 +1348,17 @@
 
                 const prog = this.getProgressConfig('hardware', rec.status || 'Pending');
                 const pb = document.getElementById('hw-progress-bar');
-                if (pb) {
-                    pb.style.width = `${prog.percent}%`;
-                    pb.className = `${prog.color} h-1.5 rounded-full transition-all duration-500`;
-                }
+                if (pb) { pb.style.width = `${prog.percent}%`; pb.className = `${prog.color} h-1.5 rounded-full transition-all duration-500`; }
 
                 const chargerChk = document.getElementById('disp-chk-charger');
                 const chargerContainer = document.getElementById('charger-specs-container');
                 const chargerSpecs = document.getElementById('disp-charger-specs');
-                
                 if (chargerChk && chargerContainer && chargerSpecs && !chargerChk.dataset.modified) {
                     if (rec.charger) {
                         chargerChk.checked = rec.charger.included || false;
                         if (!chargerSpecs.dataset.modified) chargerSpecs.value = rec.charger.specs || '';
-                        if (chargerChk.checked) chargerContainer.classList.remove('hidden');
-                        else chargerContainer.classList.add('hidden');
-                    } else {
-                        chargerChk.checked = false;
-                        chargerSpecs.value = '';
-                        chargerContainer.classList.add('hidden');
-                    }
+                        if (chargerChk.checked) chargerContainer.classList.remove('hidden'); else chargerContainer.classList.add('hidden');
+                    } else { chargerChk.checked = false; chargerSpecs.value = ''; chargerContainer.classList.add('hidden'); }
                 }
 
                 const setIcon = (id, condition) => {
@@ -1278,18 +1376,12 @@
                 const rec = this.currentRecord;
                 this.populateHardwareDisplayOnly();
                 this.renderGalleries(rec); 
-
-                const safeSetValue = (id, val) => { 
-                    const el = document.getElementById(id); 
-                    if(el && !el.dataset.modified) el.value = val; 
-                };
-                
+                const safeSetValue = (id, val) => { const el = document.getElementById(id); if(el && !el.dataset.modified) el.value = val; };
                 safeSetValue('update-tech-name', rec.techName || "");
                 safeSetValue('update-status', rec.status || 'Pending');
                 safeSetValue('update-notes', rec.techNotes || '');
                 safeSetValue('update-eta', rec.estimatedCompletionDate || '');
                 safeSetValue('update-tech-comments', rec.techComments || '');
-                
                 const parts = rec.partsRequired || {};
                 this.loadPartData('screen', parts.screen, ['specs', 'pn']);
                 this.loadPartData('mobo', parts.mobo, ['pn']);
@@ -1301,23 +1393,20 @@
                 this.loadPartData('keyboard', parts.keyboard, ['layout', 'backlit']);
                 this.loadPartData('chassis', parts.chassis, ['desc']);
                 this.loadPartData('paste', parts.paste, ['type']);
-                
                 const otherInput = document.getElementById('part-other');
                 if (otherInput && !otherInput.dataset.modified) otherInput.value = parts.other || '';
             }
 
-            // --- UI POPULATION: SOFTWARE ---
+            // ==========================================
+            // SOFTWARE WORKSPACE
+            // ==========================================
             populateSoftwareDisplayOnly() {
                 const rec = this.currentRecord;
                 const safeSetText = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
-                const safeSetValue = (id, val) => { 
-                    const el = document.getElementById(id); 
-                    if(el && !el.dataset.modified && document.activeElement !== el) el.value = val; 
-                };
+                const safeSetValue = (id, val) => { const el = document.getElementById(id); if(el && !el.dataset.modified && document.activeElement !== el) el.value = val; };
 
                 safeSetText('soft-disp-ref', `SFT-${rec.refId}`);
                 safeSetText('soft-disp-status', rec.status || 'Requirements Gathering');
-                
                 safeSetValue('soft-disp-project', rec.projectName || '');
                 safeSetValue('soft-disp-client', rec.clientName || '');
                 safeSetValue('soft-disp-platform', rec.platform || 'Web Application');
@@ -1328,38 +1417,28 @@
 
                 const prog = this.getProgressConfig('software', rec.status || 'Requirements Gathering');
                 const pb = document.getElementById('sw-progress-bar');
-                if (pb) {
-                    pb.style.width = `${prog.percent}%`;
-                    pb.className = `${prog.color} h-1.5 rounded-full transition-all duration-500`;
-                }
+                if (pb) { pb.style.width = `${prog.percent}%`; pb.className = `${prog.color} h-1.5 rounded-full transition-all duration-500`; }
             }
 
             populateSoftwareWorkspace() {
                 const rec = this.currentRecord;
                 this.populateSoftwareDisplayOnly();
-
-                const safeSetValue = (id, val) => { 
-                    const el = document.getElementById(id); 
-                    if(el && !el.dataset.modified) el.value = val; 
-                };
-                
+                const safeSetValue = (id, val) => { const el = document.getElementById(id); if(el && !el.dataset.modified) el.value = val; };
                 safeSetValue('update-soft-dev', rec.devAssigned || "");
                 safeSetValue('update-soft-status', rec.status || 'Requirements Gathering');
                 safeSetValue('update-soft-notes', rec.devNotes || '');
             }
 
-            // --- UI POPULATION: SUPPORT ---
+            // ==========================================
+            // SUPPORT WORKSPACE (enhanced)
+            // ==========================================
             populateSupportDisplayOnly() {
                 const rec = this.currentRecord;
                 const safeSetText = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
-                const safeSetValue = (id, val) => { 
-                    const el = document.getElementById(id); 
-                    if(el && !el.dataset.modified && document.activeElement !== el) el.value = val; 
-                };
+                const safeSetValue = (id, val) => { const el = document.getElementById(id); if(el && !el.dataset.modified && document.activeElement !== el) el.value = val; };
 
                 safeSetText('sup-disp-ref', `SUP-${rec.refId}`);
                 safeSetText('sup-disp-status', rec.status || 'Active');
-                
                 safeSetValue('sup-disp-biz', rec.bizName || '');
                 safeSetValue('sup-disp-contact', `${rec.contactName || ''} (${rec.contactPhone || ''})`);
                 safeSetValue('sup-disp-contract', rec.contractType || 'Monthly Maintenance');
@@ -1389,7 +1468,7 @@
                     if (devsArr.length === 0) {
                         devsList.innerHTML = '<p class="text-slate-400 text-xs py-2">No devices registered.</p>';
                     } else {
-                        devsArr.forEach((dev, i) => {
+                        devsArr.forEach(dev => {
                             devsList.innerHTML += `
                                 <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
                                     <div class="flex justify-between items-center">
@@ -1397,44 +1476,68 @@
                                         <span class="text-[9px] bg-white text-slate-500 px-2 py-0.5 rounded border border-slate-200">${dev.serial || 'No S/N'}</span>
                                     </div>
                                     <p class="text-[10px] text-slate-500 mt-1">${dev.location || 'Unknown Location'} • ${dev.os || 'N/A'}</p>
-                                </div>
-                            `;
+                                </div>`;
                         });
                     }
                 }
 
+                // Progress bar
                 const prog = this.getProgressConfig('support', rec.status || 'Active');
                 const pb = document.getElementById('sup-progress-bar');
-                if (pb) {
-                    pb.style.width = `${prog.percent}%`;
-                    pb.className = `${prog.color} h-1.5 rounded-full transition-all duration-500`;
+                if (pb) { pb.style.width = `${prog.percent}%`; pb.className = `${prog.color} h-1.5 rounded-full transition-all duration-500`; }
+
+                // ====================================================
+                // RENDER ON-SITE PHOTOS (uploaded from employee portal)
+                // The employee portal's uploadEvidenceToWorkspace() pushes
+                // photo URLs into rec.photos[] for support records.
+                // ====================================================
+                const photosContainer = document.getElementById('sup-photos-container');
+                const photosGallery = document.getElementById('sup-photos-gallery');
+                if (photosContainer && photosGallery) {
+                    const photosArr = Array.isArray(rec.photos) ? rec.photos : [];
+                    if (photosArr.length > 0) {
+                        photosContainer.classList.remove('hidden');
+                        photosGallery.innerHTML = '';
+                        photosArr.forEach((url, i) => {
+                            const img = document.createElement('img');
+                            img.src = url;
+                            img.alt = `On-site evidence ${i + 1}`;
+                            img.className = 'sup-gallery-img animate-fade-in-up';
+                            img.style.animationDelay = `${i * 50}ms`;
+                            img.onclick = () => openLightbox(url);
+                            photosGallery.appendChild(img);
+                        });
+                    } else {
+                        photosContainer.classList.add('hidden');
+                        photosGallery.innerHTML = '';
+                    }
                 }
+
+                // ====================================================
+                // RENDER VISIT LOG FEED (parsed from maintenanceNotes)
+                // ====================================================
+                const parsedLogs = parseVisitLogs(rec.maintenanceNotes);
+                renderVisitLogs(parsedLogs);
             }
 
             populateSupportWorkspace() {
                 const rec = this.currentRecord;
                 this.populateSupportDisplayOnly();
-
-                const safeSetValue = (id, val) => { 
-                    const el = document.getElementById(id); 
-                    if(el && !el.dataset.modified) el.value = val; 
-                };
-                
+                const safeSetValue = (id, val) => { const el = document.getElementById(id); if(el && !el.dataset.modified) el.value = val; };
                 safeSetValue('update-sup-status', rec.status || 'Active');
-                safeSetValue('update-sup-notes', rec.maintenanceNotes || '');
+                // Note: we deliberately do NOT pre-fill update-sup-notes with the raw notes string
+                // — that's the "append" field. The full history is displayed in the log feed above.
             }
 
             // ==========================================
-            // EMPLOYEE SIGNOFF SYSTEM
+            // SIGN-OFF SYSTEM
             // ==========================================
             initiateSignoff(mode) {
                 this.pendingSignoffMode = mode;
                 const pinInp = document.getElementById('emp-pin-input');
                 if (pinInp) pinInp.value = '';
-                
                 const mod = document.getElementById('signoff-modal');
                 if (mod) mod.classList.add('active');
-                
                 setTimeout(() => { if(pinInp) pinInp.focus(); }, 100);
             }
 
@@ -1447,52 +1550,23 @@
             async confirmSignoff() {
                 const pinInp = document.getElementById('emp-pin-input');
                 if (!pinInp) return;
-
                 const pin = pinInp.value.trim();
-                if (pin.length !== 5) {
-                    this.showToast("PIN must be 5 digits", "error");
-                    return;
-                }
-
+                if (pin.length !== 5) { this.showToast("PIN must be 5 digits", "error"); return; }
                 this.showLoading("Verifying Signature...");
-
                 try {
                     const snap = await this.db.ref('employees').once('value');
-                    
-                    if (!snap.exists()) {
-                        this.hideLoading();
-                        this.showToast("No employees registered", "error");
-                        return;
-                    }
-
-                    let empKey = null;
-                    let empData = null;
-
+                    if (!snap.exists()) { this.hideLoading(); this.showToast("No employees registered", "error"); return; }
+                    let empKey = null; let empData = null;
                     snap.forEach(child => {
                         const data = child.val();
-                        if (String(data.employeeNumber) === String(pin)) {
-                            empKey = child.key;
-                            empData = data;
-                        }
+                        if (String(data.employeeNumber) === String(pin)) { empKey = child.key; empData = data; }
                     });
-
-                    if (!empKey) {
-                        this.hideLoading();
-                        this.showToast("Invalid Employee PIN", "error");
-                        return;
-                    }
-                    
+                    if (!empKey) { this.hideLoading(); this.showToast("Invalid Employee PIN", "error"); return; }
                     const currentMode = this.pendingSignoffMode;
                     this.cancelSignoff();
-                    
-                    if (currentMode === 'hardware') {
-                        await this.executeHardwareSave(empKey, empData);
-                    } else if (currentMode === 'software') {
-                        await this.executeSoftwareSave(empKey, empData);
-                    } else if (currentMode === 'support') {
-                        await this.executeSupportSave(empKey, empData);
-                    }
-
+                    if (currentMode === 'hardware') await this.executeHardwareSave(empKey, empData);
+                    else if (currentMode === 'software') await this.executeSoftwareSave(empKey, empData);
+                    else if (currentMode === 'support') await this.executeSupportSave(empKey, empData);
                 } catch (err) {
                     this.hideLoading();
                     this.showToast("Verification failed", "error");
@@ -1503,7 +1577,6 @@
             async pushToEmployeeHistory(empKey, taskTitle, refType) {
                 const record = this.currentRecord;
                 if (!record) return;
-                
                 await this.db.ref(`employees/${empKey}/work_history`).push({
                     refId: `${refType}-${record.refId}`,
                     title: taskTitle,
@@ -1514,13 +1587,10 @@
             getPartData(partId, fields) {
                 const cb = document.getElementById(`part-${partId}`);
                 if (!cb || !cb.checked) return null; 
-
                 let data = { needed: true };
                 fields.forEach(f => {
                     const el = document.getElementById(`part-${partId}-${f}`);
-                    if (el) {
-                        data[f] = el.type === 'checkbox' ? el.checked : el.value.trim();
-                    }
+                    if (el) data[f] = el.type === 'checkbox' ? el.checked : el.value.trim();
                 });
                 return data;
             }
@@ -1529,7 +1599,6 @@
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('upload_preset', CLOUDINARY_PRESET);
-
                 try {
                     const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
                     if (!res.ok) throw new Error("Upload failed");
@@ -1542,16 +1611,13 @@
             }
 
             // ==========================================
-            // SAVING LOGIC (Executed AFTER Signoff)
+            // SAVE: HARDWARE
             // ==========================================
             async executeHardwareSave(empKey, empData) {
                 if (!this.currentDbKey) return;
-
                 const manualTechName = document.getElementById('update-tech-name').value.trim();
                 const techName = manualTechName !== "" ? manualTechName : (empData.name || "Employee");
-                
                 const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
-                
                 const status = getVal('update-status');
                 const etaDate = getVal('update-eta');
                 const notes = getVal('update-notes');
@@ -1559,180 +1625,129 @@
                 const updatedDevice = getVal('disp-device');
                 const updatedColor = getVal('disp-color');
                 const updatedIssue = getVal('disp-issue');
-                
                 const getCheck = (id) => { const el = document.getElementById(id); return el ? el.classList.contains('fa-square-check') : false; };
-                const checks = {
-                    power: getCheck('disp-chk-power'),
-                    cracks: getCheck('disp-chk-cracks'),
-                    dataWaiver: getCheck('disp-chk-data')
-                };
-                
+                const checks = { power: getCheck('disp-chk-power'), cracks: getCheck('disp-chk-cracks'), dataWaiver: getCheck('disp-chk-data') };
                 const chargerChk = document.getElementById('disp-chk-charger');
-                const charger = {
-                    included: chargerChk ? chargerChk.checked : false,
-                    specs: getVal('disp-charger-specs')
-                };
-
+                const charger = { included: chargerChk ? chargerChk.checked : false, specs: getVal('disp-charger-specs') };
                 const partsRequired = {
-                    screen: this.getPartData('screen', ['specs', 'pn']),
-                    mobo: this.getPartData('mobo', ['pn']),
-                    battery: this.getPartData('battery', ['model']),
-                    ram: this.getPartData('ram', ['type', 'capacity']),
-                    ssd: this.getPartData('ssd', ['type', 'capacity']),
-                    fan: this.getPartData('fan', ['pn']),
-                    dcjack: this.getPartData('dcjack', ['type']),
-                    keyboard: this.getPartData('keyboard', ['layout', 'backlit']),
-                    chassis: this.getPartData('chassis', ['desc']),
-                    paste: this.getPartData('paste', ['type']),
+                    screen: this.getPartData('screen', ['specs', 'pn']), mobo: this.getPartData('mobo', ['pn']),
+                    battery: this.getPartData('battery', ['model']), ram: this.getPartData('ram', ['type', 'capacity']),
+                    ssd: this.getPartData('ssd', ['type', 'capacity']), fan: this.getPartData('fan', ['pn']),
+                    dcjack: this.getPartData('dcjack', ['type']), keyboard: this.getPartData('keyboard', ['layout', 'backlit']),
+                    chassis: this.getPartData('chassis', ['desc']), paste: this.getPartData('paste', ['type']),
                     other: getVal('part-other')
                 };
 
-                this.showLoading("Syncing File & Employee History...");
-
+                this.showLoading("Saving Repair File...");
                 try {
-                    let newBeforeUrls = [];
-                    if (this.selectedFilesBefore && this.selectedFilesBefore.length > 0) {
-                        this.showLoading(`Uploading Pre-Repair Photos...`);
-                        for (let file of this.selectedFilesBefore) {
-                            const url = await this.uploadToCloudinary(file);
-                            if (url) newBeforeUrls.push(url);
-                        }
-                    }
-
-                    let newAfterUrls = [];
-                    if (this.selectedFilesAfter && this.selectedFilesAfter.length > 0) {
-                        this.showLoading(`Uploading Post-Repair Photos...`);
-                        for (let file of this.selectedFilesAfter) {
-                            const url = await this.uploadToCloudinary(file);
-                            if (url) newAfterUrls.push(url);
-                        }
-                    }
-
-                    let mergedPhotosBefore = [...(this.currentRecord.photosBefore || []), ...newBeforeUrls];
-                    let mergedPhotosAfter = [...(this.currentRecord.photosAfter || []), ...newAfterUrls];
-
                     let updatePayload = {
-                        device: updatedDevice,
-                        color: updatedColor,
-                        issue: updatedIssue,
-                        checks: checks,
-                        charger: charger,
-                        techName: techName, 
-                        status: status,
-                        estimatedCompletionDate: etaDate,
-                        techNotes: notes,
-                        techComments: techComments,
-                        partsRequired: partsRequired,
-                        photosBefore: mergedPhotosBefore,
-                        photosAfter: mergedPhotosAfter,
+                        device: updatedDevice, color: updatedColor, issue: updatedIssue,
+                        checks, charger, techName, status, estimatedCompletionDate: etaDate,
+                        techNotes: notes, techComments, partsRequired,
+                        photosBefore: this.currentRecord.photosBefore || [],
+                        photosAfter: this.currentRecord.photosAfter || [],
                         lastUpdated: Date.now()
                     };
-
-                    if(status === 'Completed & Collected') {
-                        updatePayload.dateCollected = Date.now();
-                    }
-
+                    if(status === 'Completed & Collected') updatePayload.dateCollected = Date.now();
                     await this.db.ref('reports/' + this.currentDbKey).update(updatePayload);
                     await this.pushToEmployeeHistory(empKey, updatedDevice || 'Unknown Device', 'RGT');
-
                     this.hideLoading();
                     this.showToast("Signed & Saved Successfully!");
-
                     document.querySelectorAll('#hardware-workspace [data-modified="true"]').forEach(el => delete el.dataset.modified);
-
                     const utn = document.getElementById('update-tech-name');
                     if (utn) utn.value = techName;
-                    
-                    this.selectedFilesBefore = [];
-                    this.selectedFilesAfter = [];
-                    const pb = document.getElementById('preview-grid-before');
-                    if (pb) pb.innerHTML = '';
-                    const pa = document.getElementById('preview-grid-after');
-                    if (pa) pa.innerHTML = '';
-
                 } catch (error) {
                     this.hideLoading();
                     this.showToast("Failed to save update", "error");
                 }
             }
 
+            // ==========================================
+            // SAVE: SOFTWARE
+            // ==========================================
             async executeSoftwareSave(empKey, empData) {
                 if (!this.currentDbKey) return;
-
                 const manualDevAssigned = document.getElementById('update-soft-dev').value.trim();
                 const devAssigned = manualDevAssigned !== "" ? manualDevAssigned : (empData.name || "Developer");
-                
                 const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
-                
-                const status = getVal('update-soft-status');
-                const devNotes = getVal('update-soft-notes');
-
                 this.showLoading("Pushing Code Status...");
-
                 try {
-                    let updatePayload = {
-                        projectName: getVal('soft-disp-project'),
-                        clientName: getVal('soft-disp-client'),
-                        platform: getVal('soft-disp-platform'),
-                        techStack: getVal('soft-disp-stack'),
-                        deadline: getVal('soft-disp-deadline'),
-                        repoLink: getVal('soft-disp-repo'),
-                        requirements: getVal('soft-disp-requirements'),
-                        devAssigned: devAssigned,
-                        status: status,
-                        devNotes: devNotes,
+                    await this.db.ref('software_projects/' + this.currentDbKey).update({
+                        projectName: getVal('soft-disp-project'), clientName: getVal('soft-disp-client'),
+                        platform: getVal('soft-disp-platform'), techStack: getVal('soft-disp-stack'),
+                        deadline: getVal('soft-disp-deadline'), repoLink: getVal('soft-disp-repo'),
+                        requirements: getVal('soft-disp-requirements'), devAssigned,
+                        status: getVal('update-soft-status'), devNotes: getVal('update-soft-notes'),
                         lastUpdated: Date.now()
-                    };
-
-                    await this.db.ref('software_projects/' + this.currentDbKey).update(updatePayload);
+                    });
                     await this.pushToEmployeeHistory(empKey, this.currentRecord.projectName || 'Software App', 'SFT');
-
                     this.hideLoading();
                     this.showToast("Pipeline Signed & Updated!");
-                    
                     document.querySelectorAll('#software-workspace [data-modified="true"]').forEach(el => delete el.dataset.modified);
-
                     const usD = document.getElementById('update-soft-dev');
                     if(usD) usD.value = devAssigned;
-
                 } catch (error) {
                     this.hideLoading();
                     this.showToast("Failed to sync project", "error");
                 }
             }
 
+            // ==========================================
+            // SAVE: SUPPORT (appends new note to log)
+            // ==========================================
             async executeSupportSave(empKey, empData) {
                 if (!this.currentDbKey) return;
-
                 const manualTechAssigned = document.getElementById('update-sup-tech').value.trim();
                 const techAssigned = manualTechAssigned !== "" ? manualTechAssigned : (empData.name || "Engineer");
-                
-                const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
-                
+                const getVal = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
                 const status = getVal('update-sup-status');
-                const maintenanceNotes = getVal('update-sup-notes');
+                const newNote = getVal('update-sup-notes');
 
-                this.showLoading("Updating Maintenance Log...");
+                this.showLoading("Updating Support Log...");
 
                 try {
-                    let updatePayload = {
+                    // If there's a new note, prepend it as a formatted entry to the existing notes
+                    let updatedNotes = this.currentRecord.maintenanceNotes || '';
+                    if (newNote) {
+                        const dateStr = new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+                        const newEntry = `
+====================================
+VISIT LOG: ${dateStr}
+TYPE: Workspace Note
+TECHNICIAN: ${techAssigned}
+------------------------------------
+TASKS COMPLETED:
+  - No standard checklist items selected.
+
+PARTS USED: None
+NEXT STEPS: None
+
+NOTES: 
+${newNote}
+
+====================================
+`;
+                        updatedNotes = newEntry + updatedNotes;
+                    }
+
+                    await this.db.ref('support_businesses/' + this.currentDbKey).update({
                         bizName: getVal('sup-disp-biz'),
                         sector: getVal('sup-disp-sector'),
-                        status: status,
-                        maintenanceNotes: maintenanceNotes,
+                        status,
+                        maintenanceNotes: updatedNotes,
                         lastUpdated: Date.now()
-                    };
-
-                    await this.db.ref('support_businesses/' + this.currentDbKey).update(updatePayload);
+                    });
                     await this.pushToEmployeeHistory(empKey, `Maintenance: ${this.currentRecord.bizName || 'Business'}`, 'SUP');
 
                     this.hideLoading();
                     this.showToast("Log Signed & Saved!");
-                    
                     document.querySelectorAll('#support-workspace [data-modified="true"]').forEach(el => delete el.dataset.modified);
 
-                    const usT = document.getElementById('update-sup-tech');
-                    if(usT) usT.value = techAssigned;
+                    // Clear the append field
+                    const notesEl = document.getElementById('update-sup-notes');
+                    if (notesEl) notesEl.value = '';
+                    const techEl = document.getElementById('update-sup-tech');
+                    if (techEl) techEl.value = techAssigned;
 
                 } catch (error) {
                     this.hideLoading();
@@ -1760,17 +1775,9 @@
                 const msg = document.getElementById('toast-msg');
                 const icon = document.getElementById('toast-icon');
                 if(!toast || !msg || !icon) return;
-                
                 msg.innerText = message;
-                
-                if (type === "error") {
-                    toast.classList.add('error');
-                    icon.className = "fa-solid fa-circle-exclamation text-lg";
-                } else {
-                    toast.classList.remove('error');
-                    icon.className = "fa-solid fa-circle-check text-lg";
-                }
-
+                if (type === "error") { toast.classList.add('error'); icon.className = "fa-solid fa-circle-exclamation text-lg"; }
+                else { toast.classList.remove('error'); icon.className = "fa-solid fa-circle-check text-lg"; }
                 toast.classList.add('show');
                 setTimeout(() => toast.classList.remove('show'), 4000);
             }
