@@ -44,6 +44,11 @@
             0% { transform: translateX(-150%) skewX(-20deg); }
             100% { transform: translateX(200%) skewX(-20deg); }
         }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
         
         .animate-fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-slide-in-left { animation: slideInLeftModal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -645,7 +650,7 @@
                             <h3 class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-2">
                                 <i class="fa-solid fa-camera text-emerald-500"></i> On-Site Photo Evidence
                             </h3>
-                            <span class="text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 shadow-sm animate-pulse">
+                            <span class="text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 shadow-sm animate-pulse" style="animation: pulse-ring 2s infinite;">
                                 <i class="fa-solid fa-satellite-dish mr-1"></i> Live Sync
                             </span>
                         </div>
@@ -978,7 +983,13 @@
                     if(this.currentMode === 'hardware') this.renderQueue();
                     if(this.currentMode === 'hardware' && this.currentDbKey) {
                         const upd = this.hardwareDataAll.find(r => r.key === this.currentDbKey);
-                        if(upd) { this.currentRecord = upd; this.populateHardwareDisplayOnly(); this.renderGalleries(upd); }
+                        if(upd) { 
+                            const isNewData = this.currentRecord && this.currentRecord.lastUpdated && upd.lastUpdated && this.currentRecord.lastUpdated !== upd.lastUpdated;
+                            this.currentRecord = upd; 
+                            this.populateHardwareDisplayOnly(); 
+                            this.renderGalleries(upd); 
+                            if(isNewData) this.showToast("Live Sync: Workspace updated with new remote data!", "success");
+                        }
                     }
                     this.checkSessionState();
                 });
@@ -995,7 +1006,12 @@
                     if(this.currentMode === 'software') this.renderQueue();
                     if(this.currentMode === 'software' && this.currentDbKey) {
                         const upd = this.softwareDataAll.find(r => r.key === this.currentDbKey);
-                        if(upd) { this.currentRecord = upd; this.populateSoftwareDisplayOnly(); }
+                        if(upd) { 
+                            const isNewData = this.currentRecord && this.currentRecord.lastUpdated && upd.lastUpdated && this.currentRecord.lastUpdated !== upd.lastUpdated;
+                            this.currentRecord = upd; 
+                            this.populateSoftwareDisplayOnly(); 
+                            if(isNewData) this.showToast("Live Sync: Workspace updated with new remote data!", "success");
+                        }
                     }
                     this.checkSessionState();
                 });
@@ -1012,7 +1028,12 @@
                     if(this.currentMode === 'support') this.renderQueue();
                     if(this.currentMode === 'support' && this.currentDbKey) {
                         const upd = this.supportDataAll.find(r => r.key === this.currentDbKey);
-                        if(upd) { this.currentRecord = upd; this.populateSupportDisplayOnly(); }
+                        if(upd) { 
+                            const isNewData = this.currentRecord && this.currentRecord.lastUpdated && upd.lastUpdated && this.currentRecord.lastUpdated !== upd.lastUpdated;
+                            this.currentRecord = upd; 
+                            this.populateSupportDisplayOnly(); 
+                            if(isNewData) this.showToast("Live Sync: New Job Card / Evidence Received!", "success");
+                        }
                     }
                     this.checkSessionState();
                 });
