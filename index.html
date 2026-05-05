@@ -665,16 +665,16 @@
                  SUPPORT ACTION LOG SIDEBAR (fully parsed visit logs)
                  ==================================================== -->
             <aside class="w-full md:w-1/3 lg:max-w-sm xl:max-w-[420px] bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-[-20px_0_40px_rgba(0,0,0,0.03)] z-20">
-                <div class="p-6 sm:p-8 border-b border-slate-100 bg-slate-50/50 backdrop-blur-md">
+                <div class="p-6 sm:p-8 border-b border-slate-100 bg-slate-50/50 backdrop-blur-md shrink-0">
                     <h2 class="text-sm sm:text-base font-black text-slate-800 flex items-center gap-2 sm:gap-3 uppercase tracking-tight">
                         <i class="fa-solid fa-headset text-emerald-500 bg-emerald-100 p-1.5 sm:p-2 rounded-lg"></i> Support Action Log
                     </h2>
                 </div>
 
-                <div class="flex-1 overflow-y-auto flex flex-col">
+                <div class="flex-1 overflow-y-auto w-full bg-slate-50/50 flex flex-col">
                     
-                    <!-- Contract Status + New Note (always visible at top) -->
-                    <div class="p-6 sm:p-8 space-y-5 border-b border-slate-100 shrink-0">
+                    <!-- Contract Status + New Note -->
+                    <div class="p-6 sm:p-8 space-y-5 border-b border-slate-200 bg-white shrink-0 w-full">
                         <div class="w-full">
                             <label class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest mb-2 ml-1">Contract Status</label>
                             <select id="update-sup-status" class="custom-input font-bold text-slate-800 bg-slate-50 border-slate-200 rounded-xl py-3 sm:py-4 w-full text-xs sm:text-sm" onchange="this.dataset.modified='true'">
@@ -701,7 +701,7 @@
                     <!-- ====================================================
                          VISIT LOG FEED — parsed structured entries + raw notes
                          ==================================================== -->
-                    <div class="flex-1 overflow-y-auto p-6 sm:p-8 space-y-4 bg-slate-50/50" id="sup-log-feed">
+                    <div class="p-6 sm:p-8 space-y-4 w-full flex-1 pb-10" id="sup-log-feed">
                         <div class="flex items-center justify-between mb-2">
                             <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                 <i class="fa-solid fa-timeline text-emerald-400"></i> Visit History
